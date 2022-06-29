@@ -7,13 +7,9 @@ then
     exit 1
 fi
 
-count=0
-while true
-do 
-    if [ -d ".tigger/$count" ] 
-    then
-        echo "$count .tigger/$count"
-        break
-    fi
-    count=$((count + 1))
-done
+for commit in .tigger/[0-9]
+do
+    message=$(cat $commit/message)
+    index=$(echo "$commit" | sed -E 's/.tigger\/([0-9])/\1/')
+    echo "$index $message"
+done 
