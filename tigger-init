@@ -5,6 +5,7 @@ then
     echo "tigger-init: error: .tigger already exists"
 else
     mkdir .tigger
+    mkdir .tigger/index
     echo "Initialized empty tigger repository in .tigger"
 fi
 
