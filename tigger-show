@@ -1,0 +1,34 @@
+#!/bin/dash
+
+# Error check: .tigger exists
+if [ ! -d ".tigger" ]
+then
+    echo "tigger-show: error: tigger repository directory .tigger not found"
+    exit 1
+fi
+
+#Error check: commit has 1 argument
+if [ "$#" -ne 1 ] 
+then 
+    echo "usage: tigger-show <commit>:<filename>"
+    exit 1
+fi
+
+# Tigger-show implementation
+
+commit=$(echo $1 | cut -d':' -f1)
+filename=$(echo $1 | cut -d':' -f2)
+
+if [ -z "$filename" ] 
+then
+    echo "usage: tigger-show <commit>:<filename>"
+    exit 1
+fi
+
+if [ -z "$commit" ] 
+then
+    cat .tigger/index/"$filename"
+    exit 0
+fi
+
+cat .tigger/"$commit"/"$filename"

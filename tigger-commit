@@ -29,7 +29,7 @@ do
         mkdir ".tigger/$count"
         for file in .tigger/index/*
         do 
-            mv "$file" .tigger/"$count"
+            cp "$file" .tigger/"$count"
         done
         echo "$2" > .tigger/"$count"/message
         echo "Committed as commit $count"
