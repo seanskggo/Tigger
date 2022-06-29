@@ -1,0 +1,39 @@
+#!/bin/dash
+
+#Error check: commit has 2 arguments
+if [ "$#" -ne 2 ] 
+then 
+    echo "usage: tigger-commit [-a] -m commit-message"
+    exit 1
+fi
+
+# Error check: .tigger exists
+if [ ! -d ".tigger" ]
+then
+    echo "tigger-commit: error: tigger repository directory .tigger not found"
+    exit 1
+fi
+
+# Error check: .tigger/index is not empty
+if [ -z "$(ls -A .tigger/index)" ]
+then
+    echo "nothing to commit"
+    exit 1
+fi
+
+count=0
+while true
+do 
+    if [ ! -d ".tigger/$count" ] 
+    then
+        mkdir ".tigger/$count"
+        for file in .tigger/index/*
+        do 
+            mv "$file" .tigger/"$count"
+        done
+        echo "$2" > .tigger/"$count"/"$2"
+        echo "Committed as commit $count"
+        break
+    fi
+    count=$((count + 1))
+done
