@@ -14,10 +14,15 @@ then
     exit 1
 fi
 
-# Tigger-show implementation
-
 commit=$(echo $1 | cut -d':' -f1)
 filename=$(echo $1 | cut -d':' -f2)
+
+# Error check: commit exists
+if [ ! -d ".tigger/$commit" ]
+then
+    echo "tigger-show: error: unknown commit '$commit'"
+    exit 1
+fi
 
 if [ -z "$filename" ] 
 then
@@ -26,9 +31,29 @@ then
 fi
 
 if [ -z "$commit" ] 
-then
+then    
+
+    # Error check: file exists in index
+    if [ ! -f .tigger/index/"$filename" ]
+    then
+        echo "tigger-show: error: '$filename' not found in index"
+        exit 1
+    fi
+
     cat .tigger/index/"$filename"
-    exit 0
+
+else 
+
+    # Error check: file exists in commit
+    if [ ! -f .tigger/"$commit"/"$filename" ]
+    then
+        echo "tigger-show: error: '$filename' not found in commit $commit"
+        exit 1
+    fi
+    
+    cat .tigger/"$commit"/"$filename"
+
 fi
 
-cat .tigger/"$commit"/"$filename"
+
+

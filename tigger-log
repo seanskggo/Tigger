@@ -7,9 +7,13 @@ then
     exit 1
 fi
 
+log=''
+
 for commit in .tigger/[0-9]
 do
     message=$(cat $commit/message)
     index=$(echo "$commit" | sed -E 's/.tigger\/([0-9])/\1/')
-    echo "$index $message"
+    log="$log,$index $message"
 done 
+
+echo "$log" | cut -d',' -f2- | tr ',' '\n' | sort  -r
