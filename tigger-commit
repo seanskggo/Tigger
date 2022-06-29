@@ -31,7 +31,7 @@ do
         do 
             mv "$file" .tigger/"$count"
         done
-        echo "$2" > .tigger/"$count"/"$2"
+        echo "$2" > .tigger/"$count"/message
         echo "Committed as commit $count"
         break
     fi
