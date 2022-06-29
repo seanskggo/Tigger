@@ -21,19 +21,25 @@ then
     exit 1
 fi
 
+# Get latest commit number
 count=0
 while true
 do 
     if [ ! -d ".tigger/$count" ] 
     then
-        mkdir ".tigger/$count"
-        for file in .tigger/index/*
-        do 
-            cp "$file" .tigger/"$count"
-        done
-        echo "$2" > .tigger/"$count"/message
-        echo "Committed as commit $count"
         break
     fi
     count=$((count + 1))
 done
+
+last_commit=$((count - 1))
+new_commit=$count
+
+mkdir ".tigger/$new_commit"
+for file in .tigger/index/*
+do 
+    cp "$file" .tigger/"$new_commit"
+done
+echo "$2" > .tigger/"$new_commit"/message
+echo "Committed as commit $new_commit"
+
