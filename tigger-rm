@@ -1,0 +1,54 @@
+#!/bin/dash
+
+######################################################################
+# Helper Functions
+######################################################################
+
+# Delete tigger contents
+delete () {
+    echo "Deleted"
+}
+
+# Safety check for tigger-rm
+check () {
+    echo "Delete checked"
+}
+
+# Delete tigger cache
+cache_delete () {
+    echo "Deleted cache"
+}
+
+# Error check: .tigger exists
+check_tigger () {
+    if [ ! -d ".tigger" ]
+    then
+        echo "tigger-rm: error: tigger repository directory .tigger not found"
+        exit 1
+    fi
+}
+
+######################################################################
+# Main
+######################################################################
+
+# Error check
+check_tigger
+
+# Case 1: tigger-rm --force --cached filenames...
+if [ "$1" == "--force" -a "$2" == "--cached" ]
+then    
+    cache_delete
+# Case 2: tigger-rm --force filenames...
+elif [ "$1" == "--force" ]
+then
+    delete
+# Case 3: tigger-rm --cached filenames...
+elif [ "$1" == "--cached" ]
+then
+    cache_delete
+# Case 4: tigger-rm filenames...
+else 
+    check
+    delete
+fi
