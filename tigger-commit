@@ -59,6 +59,7 @@ then
     fi
 fi
 
+# Everything looks good - proceed to commit changes
 mkdir ".tigger/$new_commit"
 for file in .tigger/index/*
 do 
