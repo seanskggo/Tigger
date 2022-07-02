@@ -1,70 +1,73 @@
 #!/bin/dash
 
-#Error check: commit has 2 arguments
-if [ "$#" -ne 2 ] 
-then 
-    echo "usage: tigger-commit [-a] -m commit-message"
-    exit 1
-fi
+######################################################################
+# Helper Functions
+######################################################################
 
-# Error check: .tigger exists
-if [ ! -d ".tigger" ]
-then
-    echo "tigger-commit: error: tigger repository directory .tigger not found"
-    exit 1
-fi
-
-# Error check: .tigger/index is not empty
-if [ -z "$(ls -A .tigger/index)" ]
-then
-    echo "nothing to commit"
-    exit 1
-fi
-
-# Get latest commit number
-count=0
-while true
-do 
-    if [ ! -d ".tigger/$count" ] 
+# Error check: .tigger exists and index is not empty
+check_tigger () {
+    if [ ! -d ".tigger" ]
     then
-        break
+        echo "tigger-commit: error: tigger repository directory .tigger not found"
+        exit 1
     fi
-    count=$((count + 1))
-done
-
-# Found new commit number
-new_commit=$count
-
-# Check if there are any changes in index since last commit
-if [ $count -gt 0 ]
-then 
-    last_commit=$((new_commit - 1))
-    flag=0
-    for commit in .tigger/$last_commit/*
-    do  
-        filename=$(echo $commit | sed -E 's/.tigger\/.*\/(.*)/\1/')
-        if [ "$filename" != "message" ]
-        then
-            diff=$(diff .tigger/"$last_commit"/"$filename" .tigger/index/"$filename")
-            if [ ! -z "$diff" ] 
-            then 
-                flag=1
-            fi
-        fi
-    done
-    if [ $flag -ne 1 ] 
-    then 
+    if [ -z "$(ls -A .tigger/index)" ]
+    then
         echo "nothing to commit"
         exit 1
     fi
-fi
+}
 
-# Everything looks good - proceed to commit changes
-mkdir ".tigger/$new_commit"
-for file in .tigger/index/*
-do 
-    cp "$file" .tigger/"$new_commit"
-done
-echo "$2" > .tigger/"$new_commit"/message
-echo "Committed as commit $new_commit"
+# Get new commit number
+get_new_commit_number () {
+    count=0
+    while true
+    do 
+        if [ ! -d ".tigger/$count" ] 
+        then
+            echo $count
+            break
+        fi
+        count=$((count + 1))
+    done
+}
 
+# Check if there are any current changes between given commit and index
+# Exit with error message if so
+# Usage: check_change_diff <commit>
+check_commit_diff () {
+    if [ $1 -ge 0 ]
+    then 
+        diff=$(diff -r .tigger/"$1" .tigger/index)
+        if [ -z "$diff" ] 
+        then 
+            echo "nothing to commit"
+            exit 1
+        fi
+    fi
+}
+
+# Given a commit number, commit the changes in tigger
+# Usage: commit <commit> <message>
+commit () {
+    mkdir ".tigger/$1"
+    for file in .tigger/index/*
+    do 
+        cp "$file" .tigger/"$1"
+    done
+    echo "$2" > .tigger/message/"$1"
+    echo "Committed as commit $1"
+}
+
+######################################################################
+# Main
+######################################################################
+
+check_tigger
+
+new_commit=$(get_new_commit_number)
+old_commit=$((new_commit - 1))
+
+check_commit_diff "$old_commit"
+
+commit "$new_commit" "$2"

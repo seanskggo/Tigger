@@ -11,8 +11,8 @@ log=''
 
 for commit in .tigger/[0-9]
 do
-    message=$(cat $commit/message)
     index=$(echo "$commit" | sed -E 's/.tigger\/([0-9])/\1/')
+    message=$(cat .tigger/message/"$index")
     log="$log,$index $message"
 done 
 
