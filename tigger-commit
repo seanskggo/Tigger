@@ -59,6 +59,19 @@ commit () {
     echo "Committed as commit $1"
 }
 
+# Add files to index (tigger-add functionality)
+add_to_index () {
+    for file in *
+    do
+        if [ ! -f "$file" ]
+        then
+            echo "tigger-commit: error: can not open '$file'"
+            exit 1
+        fi
+        cp $file .tigger/index
+    done
+}
+
 ######################################################################
 # Main
 ######################################################################
@@ -68,6 +81,20 @@ check_tigger
 new_commit=$(get_new_commit_number)
 old_commit=$((new_commit - 1))
 
-check_commit_diff "$old_commit"
+# Case 1: tigger-commit -a -m <message>
+if [ "$1" = "-a" ] && [ "$2" = "-m" ] && [ ! -z "$3" ]
+then    
+    add_to_index
+    check_commit_diff "$old_commit"
+    commit "$new_commit" "$2"
+# Case 2: tigger-commit -m <message>
+elif [ "$1" = "-m" ] && [ ! -z "$2" ]
+then
+    check_commit_diff "$old_commit"
+    commit "$new_commit" "$2"
+# Default - raise usage error
+else 
+    echo "usage: tigger-commit [-a] -m commit-message"
+    exit 1
+fi
 
-commit "$new_commit" "$2"
