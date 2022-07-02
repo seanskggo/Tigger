@@ -11,11 +11,6 @@ check_tigger () {
         echo "tigger-commit: error: tigger repository directory .tigger not found"
         exit 1
     fi
-    if [ -z "$(ls -A .tigger/index)" ]
-    then
-        echo "nothing to commit"
-        exit 1
-    fi
 }
 
 # Get new commit number
@@ -53,7 +48,10 @@ commit () {
     mkdir ".tigger/$1"
     for file in .tigger/index/*
     do 
-        cp "$file" .tigger/"$1"
+        if [ -f "$file" ] 
+        then 
+            cp "$file" .tigger/"$1"
+        fi
     done
     echo "$2" > .tigger/message/"$1"
     echo "Committed as commit $1"

@@ -4,20 +4,44 @@
 # Helper Functions
 ######################################################################
 
-# Delete tigger contents
-delete () {
-    echo "Deleted"
+# Check if file is in tigger index
+check_file_in_index () {
+    if [ ! -f .tigger/index/"$1" ]
+    then
+        echo "tigger-rm: error: '"$1"' is not in the tigger repository"
+        exit 1
+    fi
 }
 
-# Safety check for tigger-rm
-check () {
-    echo "Delete checked"
+# Delete file from index and current repository
+# Usage: delete <filename>    
+full_delete () {
+    for file
+    do 
+        check_file_in_index "$file"
+        rm .tigger/index/"$file"
+        if [ -f "$file" ]
+        then
+            rm "$file"
+        fi
+    done
 }
 
-# Delete tigger cache
+# Delete file from tigger cache/index
+# Usage: cache_delete <filename>
 cache_delete () {
-    echo "Deleted cache"
+    for file
+    do 
+        check_file_in_index "$file"
+        rm .tigger/index/"$file"
+    done
 }
+
+# # Safety check for tigger-rm
+# check () {
+#     echo "tigger-rm: error: 'c' is not in the tigger repository"
+#     echo "tigger-rm: error: 'c' has staged changes in the index"
+# }
 
 # Error check: .tigger exists
 check_tigger () {
@@ -36,19 +60,23 @@ check_tigger () {
 check_tigger
 
 # Case 1: tigger-rm --force --cached filenames...
-if [ "$1" == "--force" -a "$2" == "--cached" ]
+if [ "$1" = "--force" ] && [ "$2" = "--cached" ] && [ ! -z "$3" ]
 then    
-    cache_delete
+    shift 2
+    cache_delete "$@"
 # Case 2: tigger-rm --force filenames...
-elif [ "$1" == "--force" ]
+elif [ "$1" = "--force" ] && [ ! -z "$2" ]
 then
-    delete
+    shift 1
+    full_delete "$@"
 # Case 3: tigger-rm --cached filenames...
-elif [ "$1" == "--cached" ]
+elif [ "$1" = "--cached" ] && [ ! -z "$2" ]
 then
-    cache_delete
+    shift 1
+    cache_delete "$@"
 # Case 4: tigger-rm filenames...
 else 
-    check
-    delete
+    echo ""
+    # check "$@"
+    # delete "$@"
 fi

@@ -8,10 +8,15 @@ fi
 
 for file
 do
-    if [ ! -f "$file" ]
+    # If file is deleted but not from index, remove it without error
+    if [ ! -f "$file" ] && [ -f .tigger/index/"$file" ]
+    then    
+        rm .tigger/index/"$file"
+    elif [ -f "$file" ]
     then
+        cp $file .tigger/index
+    else 
         echo "tigger-add: error: can not open '$file'"
         exit 1
-    fi
-    cp $file .tigger/index
+    fi 
 done
