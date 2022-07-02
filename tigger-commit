@@ -13,27 +13,25 @@ check_tigger () {
     fi
 }
 
-# Get new commit number
-get_new_commit_number () {
-    count=0
-    while true
-    do 
-        if [ ! -d ".tigger/$count" ] 
-        then
-            echo $count
-            break
-        fi
-        count=$((count + 1))
-    done
+# Return the next new commit number
+# Usage: get_new_commit 
+get_new_commit () {
+    if [ -f .tigger/last_commit ] 
+    then
+        last_commit=$(cat .tigger/last_commit)
+        echo "$((last_commit + 1))"
+    else
+        echo "0"
+    fi
 }
 
-# Check if there are any current changes between given commit and index
-# Exit with error message if so
-# Usage: check_change_diff <commit>
-check_commit_diff () {
-    if [ $1 -ge 0 ]
-    then 
-        diff=$(diff -r .tigger/"$1" .tigger/index)
+# Check if there are any current changes between given last commit and index
+# Usage: check_last_commit_diff 
+check_last_commit_diff () {
+    if [ -f .tigger/last_commit ] 
+    then
+        last_commit=$(cat .tigger/last_commit)
+        diff=$(diff -r .tigger/"$last_commit" .tigger/index)
         if [ -z "$diff" ] 
         then 
             echo "nothing to commit"
@@ -54,6 +52,7 @@ commit () {
         fi
     done
     echo "$2" > .tigger/message/"$1"
+    echo "$1" > .tigger/last_commit
     echo "Committed as commit $1"
 }
 
@@ -76,19 +75,18 @@ add_to_index () {
 
 check_tigger
 
-new_commit=$(get_new_commit_number)
-old_commit=$((new_commit - 1))
+new_commit=$(get_new_commit)
 
 # Case 1: tigger-commit -a -m <message>
 if [ "$1" = "-a" ] && [ "$2" = "-m" ] && [ ! -z "$3" ]
 then    
     add_to_index
-    check_commit_diff "$old_commit"
+    check_last_commit_diff
     commit "$new_commit" "$2"
 # Case 2: tigger-commit -m <message>
 elif [ "$1" = "-m" ] && [ ! -z "$2" ]
 then
-    check_commit_diff "$old_commit"
+    check_last_commit_diff
     commit "$new_commit" "$2"
 # Default - raise usage error
 else 
