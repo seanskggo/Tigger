@@ -13,8 +13,32 @@ check_file_in_index () {
     fi
 }
 
+# # Get last commit
+# check_unstaged () {
+#     count=0
+#     while true
+#     do 
+#         if [ ! -d ".tigger/$count" ] 
+#         then
+#             echo $count
+#             break
+#         fi
+#         count=$((count + 1))
+#     done
+#     count=$((count - 1))
+#     if [ $count -ge 0 ]
+#     then 
+#         diff=$(diff -r .tigger/"$1" .tigger/index)
+#         if [ ! -z "$diff" ] 
+#         then 
+#             echo "tigger-rm: error: 'c' has staged changes in the index"
+#             exit 1
+#         fi
+#     fi
+# }
+
 # Delete file from index and current repository
-# Usage: delete <filename>    
+# Usage: full_delete <filenames...>    
 full_delete () {
     for file
     do 
@@ -28,7 +52,7 @@ full_delete () {
 }
 
 # Delete file from tigger cache/index
-# Usage: cache_delete <filename>
+# Usage: cache_delete <filenames...>
 cache_delete () {
     for file
     do 
@@ -37,11 +61,19 @@ cache_delete () {
     done
 }
 
-# # Safety check for tigger-rm
-# check () {
-#     echo "tigger-rm: error: 'c' is not in the tigger repository"
-#     echo "tigger-rm: error: 'c' has staged changes in the index"
-# }
+# Delete file from index and current repository with safety check
+# Usage: safe_delete <filenames...>    
+safe_delete () {
+    for file
+    do 
+        check_file_in_index "$file" 
+        rm .tigger/index/"$file"
+        if [ -f "$file" ]
+        then
+            rm "$file"
+        fi
+    done
+}
 
 # Error check: .tigger exists
 check_tigger () {
@@ -76,7 +108,5 @@ then
     cache_delete "$@"
 # Case 4: tigger-rm filenames...
 else 
-    echo ""
-    # check "$@"
-    # delete "$@"
+    echo "NOT DONE"
 fi
