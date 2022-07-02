@@ -1,7 +1,5 @@
 #!/bin/dash
 
-# TODO Ensure only files are added. Don't add repos?
-
 if [ ! -d ".tigger" ]
 then
     echo "tigger-add: error: tigger repository directory .tigger not found"
