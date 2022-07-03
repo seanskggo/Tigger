@@ -4,7 +4,7 @@
 # Helper Functions
 ######################################################################
 
-# Error check: .tigger exists and index is not empty
+# Error check: .tigger exists 
 check_tigger () {
     if [ ! -d ".tigger" ]
     then

@@ -1,2 +1,76 @@
 #!/bin/dash
 
+######################################################################
+# Helper Functions
+######################################################################
+
+# Error check: .tigger exists 
+check_tigger () {
+    if [ ! -d ".tigger" ]
+    then
+        echo "tigger-commit: error: tigger repository directory .tigger not found"
+        exit 1
+    fi
+}
+
+# Return sorted comma separated list of unique files in index, repository 
+# and current directory (simulate hash table using regex check)
+# Usage: get_new_commit 
+get_unique_files () {
+    str=""
+    # Repository
+    if [ -f .tigger/last_commit ] 
+    then
+        for file in .tigger/"$(cat .tigger/last_commit)"/*
+        do 
+            if [ -f "$file" ]
+            then
+                file=$(echo "$file" | sed -E 's/.tigger\/.*\/(.*)/\1/')
+                str="$str-#$file#-"
+            fi
+        done
+    fi
+    # Index
+    for file in .tigger/index/*
+    do 
+        if [ -f "$file" ]
+        then
+            file=$(echo "$file" | sed -E 's/.tigger\/.*\/(.*)/\1/')
+            find=$(echo "$str" | sed -nE "/\-#$file#\-/p")
+            if [ -z "$find" ]
+            then 
+                str="$str--#$file#-"
+            fi
+        fi
+    done
+    # Current Directory
+    for file in *
+    do 
+        if [ -f "$file" ]
+        then
+            find=$(echo "$str" | sed -nE "/\-#$file#\-/p")
+            if [ -z "$find" ]
+            then 
+                str="$str-#$file#-"
+            fi
+        fi
+    done
+    echo "$str" | sed -E 's/#\-+#/,/g' | sed -E 's/(\-#|#\-)//g' | sed -E $'s/,/\n/g' | sort | tr '\n' ',' | sed 's/.$//'
+}
+
+# Given comma separated list of files, print status for each file in order
+# Usage: print_status <comma list>
+print_status () {
+    for file in $(echo "$1" | sed "s/,/ /g")
+    do
+        echo "$file"
+    done
+}
+
+######################################################################
+# Main
+######################################################################
+
+list=$(get_unique_files)
+
+print_status "$list"
