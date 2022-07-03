@@ -16,22 +16,25 @@ check_file_in_index () {
 # Throw error if there is any staging differences
 # Usage: check_if_staged <filename>
 check_if_staged () {
-    if [ -f .tigger/last_commit ]
+    # added, committed, changed - tigger-rm: error: 'file' in the repository is different to the working file
+    if [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ ! -z "$(diff "$1" .tigger/index/"$1")" ] && [ -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
     then
-        last_commit=$(cat .tigger/last_commit)
-        if [ ! -f .tigger/"$last_commit"/"$1" ] 
-        then 
-            echo "tigger-rm: error: '$1' has staged changes in the index"
-            exit 1
-        fi
-        diff=$(diff -r .tigger/"$last_commit/$1" "$1")
-        if [ ! -z "$diff" ] 
-        then 
-            echo "tigger-rm: error: '$1' has staged changes in the index"
-            exit 1
-        fi
-    else 
-        echo "tigger-rm: error: '$1' has staged changes in the index"
+        echo "tigger-rm: error: '"$1"' in the repository is different to the working file"
+        exit 1
+    # added, committed, changed, added, changed - tigger-rm: error: 'file' in index is different to both the working file and the repository
+    elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ ! -z "$(diff "$1" .tigger/index/"$1")" ] && [ ! -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
+    then
+        echo "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
+        exit 1
+    # added, committed, changed - "tigger-rm: error: 'file' has staged changes in the index
+    elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ -z "$(diff "$1" .tigger/index/"$1")" ] && [ ! -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
+    then
+        echo "tigger-rm: error: '"$1"' has staged changes in the index"
+        exit 1
+    # added - tigger-rm: error: 'file' has staged changes in the index
+    elif [ ! -f .tigger/last_commit ] || [ ! -f .tigger/$(cat .tigger/last_commit)/"$1" ]
+    then 
+        echo "tigger-rm: error: '"$1"' has staged changes in the index"
         exit 1
     fi
 }
