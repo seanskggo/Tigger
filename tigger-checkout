@@ -19,14 +19,51 @@ check_tigger () {
     then
         mkdir .tigger/branches
         mkdir .tigger/branches/master
-        rsync -Rr . .tigger/branches/master --exclude .tigger/branches
+        rsync -Rr . .tigger/branches/master --exclude .tigger/branches 
+        echo "master" > .tigger/current_branch
+    fi
+}
+
+# Check if .tigger-checkout is valid from current branch
+# usage check_branch <branch>
+check_branch () {
+    if [ $(cat .tigger/current_branch) = "$1" ]
+    then 
+        echo "Already on '"$1"'"
+        exit 1
+    elif [ ! -d .tigger/branches/"$1" ]
+    then
+        echo "tigger-checkout: error: unknown branch '"$1"'" 
+        exit 1
     fi
 }
 
 # Change to specified branch
 # Usage: change_branch <branch>
 change_branch () {
-    echo "Changed branch"
+    # Save state to current branch
+    rsync -Rr . .tigger/branches/$(cat .tigger/current_branch) --exclude .tigger
+    rsync -Rr .tigger .tigger/branches/$(cat .tigger/current_branch) --exclude .tigger/branches --exclude .tigger/current_branch 
+    # Delete state
+    rm -rf *
+    for ele in .tigger/*
+    do  
+        if [ "$ele" != ".tigger/branches" ] && [ "$ele" != ".tigger/current_branch" ]
+        then 
+            rm -rf "$ele"
+        fi
+    done
+    # Load state from specified branch
+    for file in .tigger/branches/"$1"/*
+    do 
+        cp "$file" .
+    done
+    for file in .tigger/branches/"$1"/.tigger/*
+    do 
+        cp -r "$file" .tigger
+    done
+    echo "$1" > .tigger/current_branch
+    echo "Switched to branch '"$1"'"
 }
 
 ######################################################################
@@ -38,6 +75,7 @@ check_tigger
 # Case 1: tigger-branch <branch>
 if [ ! -z "$1" ] && [ -z "$2" ]
 then        
+    check_branch "$1"
     change_branch "$1"
 # Default: raise error
 else 
@@ -45,3 +83,37 @@ else
 fi
 
 
+# rm -rf * && rm -rf .tigger
+# ../tigger-init
+# touch a
+# ../tigger-add a
+# ../tigger-commit -m asdf
+# ../tigger-status
+# ../tigger-branch asdf
+# touch b
+# ../tigger-add b
+# ../tigger-commit -m fdsa
+# ../tigger-checkout asdf
+
+# Also create test case where git commit -am does not work but git add and then commit works
+
+# rm -rf * && rm -rf .tigger
+
+# 2041 tigger-init
+
+# touch a && 2041 tigger-add a && 2041 tigger-commit -m asdf
+
+# 2041 tigger-checkout master
+# 2041 tigger-branch b1 && 2041 tigger-checkout b1
+
+# touch b && 2041 tigger-add b && 2041 tigger-commit -m asdf
+
+# 2041 tigger-checkout master
+# 2041 tigger-branch b2 && 2041 tigger-checkout b2
+
+# touch c && 2041 tigger-add c && 2041 tigger-commit -m asdf
+
+# 2041 tigger-checkout master
+# 2041 tigger-branch b3 && 2041 tigger-checkout b3
+
+# touch d && 2041 tigger-add d && 2041 tigger-commit -m asdf
