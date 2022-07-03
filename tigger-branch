@@ -4,6 +4,58 @@
 # Helper Functions
 ######################################################################
 
+# Error check: .tigger exists and first commit exists. If it exists, 
+# create master branch by default
+check_tigger () {
+    if [ ! -d ".tigger" ]
+    then
+        echo "tigger-rm: error: tigger repository directory .tigger not found"
+        exit 1
+    elif [ ! -f .tigger/last_commit ]
+    then    
+        echo "tigger-branch: error: this command can not be run until after the first commit"
+        exit 1
+    fi
+}
+
+# List current branch names
+# show_branches 
+show_branches () {
+    echo "showed branches"
+}
+
+# Delete branch 
+# delete_branch <branch>
+delete_branch() {
+    echo "deleted branch"
+}
+
+# Create branch
+# create_branch <branch>
+create_branch () {
+    echo "created branch"
+}
+
 ######################################################################
 # Main
 ######################################################################
+
+# Error check
+check_tigger
+
+# Case 1: tigger-branch <branch>
+if [ ! -z "$1" ] && [ -z "$2" ]
+then        
+    create_branch "$1"
+# Case 2: tigger-branch -d <branch>
+elif [ "$1" = "-d" ] && [ ! -z "$2" ] && [ -z "$3" ]
+then
+    delete_branch "$2"
+# Case 3: tigger-branch
+elif [ -z "$1" ] 
+then    
+    show_branches
+# Default: raise error
+else 
+    echo "usage: tigger-branch [-d] <branch>"
+fi
