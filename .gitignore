@@ -1,2 +1,3 @@
 .tigger/*
 [!(tigger|.gitignore)]*
+test
