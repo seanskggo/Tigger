@@ -63,7 +63,29 @@ get_unique_files () {
 print_status () {
     for file in $(echo "$1" | sed "s/,/ /g")
     do
-        echo "$file"
+        # added, committed, changed, added, changed -  file changed, different changes staged for commit
+        # added, committed, changed, added - file changed, changes staged for commit
+        # added, commited, changed - file changed, changes not staged for commit
+        # added, committed, rm - file deleted
+        if [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ ! -f "$file" ] && [ -f .tigger/index/"$file" ]
+        then 
+            echo "$file - file deleted"
+        # added, committed, tigger-rm - deleted
+        elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ ! -f "$file" ] && [ ! -f .tigger/index/"$file" ]
+        then 
+            echo "$file - deleted"
+        # added, committed - same as repo
+        elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ -z "$(diff "$file" .tigger/index/"$file")" ] && [ -z "$(diff "$file" .tigger/$(cat .tigger/last_commit)/"$file")" ]
+        then 
+            echo "$file - same as repo"
+        # added - added to index
+        elif [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ -z "$(diff "$file" .tigger/index/"$file")" ]
+        then
+            echo "$file - added to index"
+        # nothing - untracked
+        else 
+            echo "$file - untracked"
+        fi
     done
 }
 
