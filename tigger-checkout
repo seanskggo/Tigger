@@ -4,6 +4,27 @@
 # Helper Functions
 ######################################################################
 
+# Error check: .tigger exists and first commit exists. If it exists, 
+# create master branch by default
+check_tigger () {
+    if [ ! -d ".tigger" ]
+    then
+        echo "tigger-checkout: error: tigger repository directory .tigger not found"
+        exit 1
+    elif [ ! -f .tigger/last_commit ]
+    then    
+        echo "tigger-checkout: error: this command can not be run until after the first commit"
+        exit 1
+    elif [ ! -d .tigger/branches ]
+    then
+        mkdir .tigger/branches
+        mkdir .tigger/branches/master
+        rsync -Rr . .tigger/branches/master --exclude .tigger/branches
+    fi
+}
+
 ######################################################################
 # Main
 ######################################################################
+
+check_tigger

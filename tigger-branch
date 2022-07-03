@@ -9,7 +9,7 @@
 check_tigger () {
     if [ ! -d ".tigger" ]
     then
-        echo "tigger-rm: error: tigger repository directory .tigger not found"
+        echo "tigger-branch: error: tigger repository directory .tigger not found"
         exit 1
     elif [ ! -f .tigger/last_commit ]
     then    
