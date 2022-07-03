@@ -23,8 +23,25 @@ check_tigger () {
     fi
 }
 
+# Change to specified branch
+# Usage: change_branch <branch>
+change_branch () {
+    echo "Changed branch"
+}
+
 ######################################################################
 # Main
 ######################################################################
 
 check_tigger
+
+# Case 1: tigger-branch <branch>
+if [ ! -z "$1" ] && [ -z "$2" ]
+then        
+    change_branch "$1"
+# Default: raise error
+else 
+    echo "usage: tigger-checkout <branch>"
+fi
+
+
