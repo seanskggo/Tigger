@@ -15,12 +15,18 @@ check_tigger () {
     then    
         echo "tigger-branch: error: this command can not be run until after the first commit"
         exit 1
+    elif [ ! -d .tigger/branches ]
+    then
+        mkdir .tigger/branches
+        mkdir .tigger/branches/master
+        rsync -Rr . .tigger/branches/master --exclude .tigger/branches
     fi
 }
 
 # List current branch names
 # show_branches 
 show_branches () {
+
     echo "showed branches"
 }
 
