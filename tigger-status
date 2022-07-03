@@ -8,7 +8,7 @@
 check_tigger () {
     if [ ! -d ".tigger" ]
     then
-        echo "tigger-commit: error: tigger repository directory .tigger not found"
+        echo "tigger-status: error: tigger repository directory .tigger not found"
         exit 1
     fi
 }
@@ -109,6 +109,8 @@ print_status () {
 ######################################################################
 # Main
 ######################################################################
+
+check_tigger
 
 list=$(get_unique_files)
 
