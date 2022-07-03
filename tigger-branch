@@ -40,8 +40,13 @@ delete_branch() {
     then 
         echo "tigger-branch: error: branch '"$1"' doesn't exist"
         exit 1
+    elif [ "$1" = "master" ]
+    then 
+        echo "tigger-branch: error: can not delete branch 'master'"
+        exit 1
     fi
     rm -rf .tigger/branches/"$1"
+    echo "Deleted branch '"$1"'"
 }
 
 # Create branch
