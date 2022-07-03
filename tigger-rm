@@ -39,6 +39,22 @@ check_if_staged () {
     fi
 }
 
+# Throw error if there is any staging differences in cache
+# Usage: check_if_staged_cached <filename>
+check_if_staged_cached () {
+    # added, committed, changed, added, changed - tigger-rm: error: 'file' in index is different to both the working file and the repository
+    if [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ ! -z "$(diff "$1" .tigger/index/"$1")" ] && [ ! -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
+    then
+        echo "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
+        exit 1
+    # added - tigger-rm: error: 'file' has staged changes in the index
+    elif [ ! -f "$1" ]
+    then 
+        echo "tigger-rm: error: '"$1"' has staged changes in the index"
+        exit 1
+    fi
+}
+
 # Delete file from index and current repository
 # Usage: full_delete <filenames...>    
 full_delete () {
@@ -62,6 +78,18 @@ cache_delete () {
         rm .tigger/index/"$file"
     done
 }
+
+# Delete file from tigger cache/index safely
+# Usage: safe_cache_delete <filenames...>
+safe_cache_delete () {
+    for file
+    do 
+        check_file_in_index "$file"
+        check_if_staged_cached "$file"
+        rm .tigger/index/"$file"
+    done
+}
+
 
 # Delete file from index and current repository with safety check
 # Usage: safe_delete <filenames...>    
@@ -108,7 +136,7 @@ then
 elif [ "$1" = "--cached" ] && [ ! -z "$2" ]
 then
     shift 1
-    cache_delete "$@"
+    safe_cache_delete "$@"
 # Case 4: tigger-rm filenames...
 else 
     safe_delete "$@"
