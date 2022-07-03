@@ -26,20 +26,34 @@ check_tigger () {
 # List current branch names
 # show_branches 
 show_branches () {
-
-    echo "showed branches"
+    for dir in .tigger/branches/*
+    do
+        dir=$(echo "$dir" | sed -E 's/.tigger\/branches\/(.*)/\1/')
+        echo "$dir"
+    done
 }
 
 # Delete branch 
 # delete_branch <branch>
 delete_branch() {
-    echo "deleted branch"
+    if [ ! -d .tigger/branches/"$1" ]
+    then 
+        echo "tigger-branch: error: branch '"$1"' doesn't exist"
+        exit 1
+    fi
+    rm -rf .tigger/branches/"$1"
 }
 
 # Create branch
 # create_branch <branch>
 create_branch () {
-    echo "created branch"
+    if [ -d .tigger/branches/"$1" ]
+    then 
+        echo "tigger-branch: error: branch '"$1"' already exists"
+        exit 1
+    fi
+    mkdir .tigger/branches/"$1"
+    rsync -Rr . .tigger/branches/"$1" --exclude .tigger/branches
 }
 
 ######################################################################
