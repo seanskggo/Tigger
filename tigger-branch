@@ -19,7 +19,8 @@ check_tigger () {
     then
         mkdir .tigger/branches
         mkdir .tigger/branches/master
-        rsync -Rr . .tigger/branches/master --exclude .tigger/branches
+        cp -r .tigger/index .tigger/branches/master/index
+        rsync -Rr . .tigger/branches/master/files --exclude .tigger
         echo "master" > .tigger/current_branch
     fi
 }
@@ -59,7 +60,8 @@ create_branch () {
         exit 1
     fi
     mkdir .tigger/branches/"$1"
-    rsync -Rr . .tigger/branches/"$1" --exclude .tigger/branches --exclude .tigger/current_branch
+    cp -r .tigger/index .tigger/branches/"$1"/index
+    rsync -Rr . .tigger/branches/"$1"/files --exclude .tigger
 }
 
 ######################################################################

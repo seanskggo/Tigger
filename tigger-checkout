@@ -19,7 +19,8 @@ check_tigger () {
     then
         mkdir .tigger/branches
         mkdir .tigger/branches/master
-        rsync -Rr . .tigger/branches/master --exclude .tigger/branches 
+        cp -r .tigger/index .tigger/branches/master/index
+        rsync -Rr . .tigger/branches/master/files --exclude .tigger
         echo "master" > .tigger/current_branch
     fi
 }
@@ -42,26 +43,13 @@ check_branch () {
 # Usage: change_branch <branch>
 change_branch () {
     # Save state to current branch
-    rsync -Rr . .tigger/branches/$(cat .tigger/current_branch) --exclude .tigger
-    rsync -Rr .tigger .tigger/branches/$(cat .tigger/current_branch) --exclude .tigger/branches --exclude .tigger/current_branch 
+    cp -r .tigger/index .tigger/branches/$(cat .tigger/current_branch)/index
+    rsync -Rr . .tigger/branches/$(cat .tigger/current_branch)/files --exclude .tigger
     # Delete state
     rm -rf *
-    for ele in .tigger/*
-    do  
-        if [ "$ele" != ".tigger/branches" ] && [ "$ele" != ".tigger/current_branch" ]
-        then 
-            rm -rf "$ele"
-        fi
-    done
     # Load state from specified branch
-    for file in .tigger/branches/"$1"/*
-    do 
-        cp "$file" .
-    done
-    for file in .tigger/branches/"$1"/.tigger/*
-    do 
-        cp -r "$file" .tigger
-    done
+    cp -r .tigger/branches/"$1"/index .tigger/index
+    cp -r .tigger/branches/"$1"/files/* .
     echo "$1" > .tigger/current_branch
     echo "Switched to branch '"$1"'"
 }
@@ -122,3 +110,5 @@ fi
 # ../tigger-checkout master
 # ../tigger-branch b3 && ../tigger-checkout b3
 # touch d && ../tigger-add d && ../tigger-commit -m asdf
+
+# rm -rf * && rm -rf .tigger && ../tigger-init && touch a && ../tigger-add a && ../tigger-commit -m asdf && touch b && ../tigger-checkout master
