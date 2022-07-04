@@ -98,22 +98,27 @@ fi
 # Also create test case where git commit -am does not work but git add and then commit works
 
 # rm -rf * && rm -rf .tigger
-
 # 2041 tigger-init
-
 # touch a && 2041 tigger-add a && 2041 tigger-commit -m asdf
-
 # 2041 tigger-checkout master
 # 2041 tigger-branch b1 && 2041 tigger-checkout b1
-
 # touch b && 2041 tigger-add b && 2041 tigger-commit -m asdf
-
 # 2041 tigger-checkout master
 # 2041 tigger-branch b2 && 2041 tigger-checkout b2
-
 # touch c && 2041 tigger-add c && 2041 tigger-commit -m asdf
-
 # 2041 tigger-checkout master
 # 2041 tigger-branch b3 && 2041 tigger-checkout b3
-
 # touch d && 2041 tigger-add d && 2041 tigger-commit -m asdf
+
+# rm -rf * && rm -rf .tigger
+# ../tigger-init
+# touch a && ../tigger-add a && ../tigger-commit -m asdf
+# ../tigger-checkout master
+# ../tigger-branch b1 && ../tigger-checkout b1
+# touch b && ../tigger-add b && ../tigger-commit -m asdf
+# ../tigger-checkout master
+# ../tigger-branch b2 && ../tigger-checkout b2
+# touch c && ../tigger-add c && ../tigger-commit -m asdf
+# ../tigger-checkout master
+# ../tigger-branch b3 && ../tigger-checkout b3
+# touch d && ../tigger-add d && ../tigger-commit -m asdf
