@@ -112,3 +112,52 @@ fi
 # touch d && ../tigger-add d && ../tigger-commit -m asdf
 
 # rm -rf * && rm -rf .tigger && ../tigger-init && touch a && ../tigger-add a && ../tigger-commit -m asdf && touch b && ../tigger-checkout master
+
+# rm -rf * && rm -rf .tigger
+# 2041 tigger-init
+# echo hello >a
+# 2041 tigger-add a
+# 2041 tigger-commit -m commit-A
+# 2041 tigger-branch b1
+# echo world >>a
+# 2041 tigger-checkout b1
+
+# echo -e "\n\n\n"
+# rm -rf * && rm -rf .tigger
+# 2041 tigger-init
+# echo hello >a
+# 2041 tigger-add a
+# 2041 tigger-commit -m commit-A
+# 2041 tigger-branch b1
+# echo world >>a
+# 2041 tigger-checkout b1
+# echo "-----------"
+# cat a
+# echo "-----------"
+# 2041 tigger-status
+# 2041 tigger-checkout master
+# echo "-----------"
+# cat a
+# echo "-----------"
+# 2041 tigger-add a
+# 2041 tigger-status
+# 2041 tigger-checkout b1
+# echo "-----------"
+# cat a
+# echo "-----------"
+# 2041 tigger-status
+# 2041 tigger-checkout master
+# echo "-----------"
+# cat a
+# echo "-----------"
+# 2041 tigger-commit -a -m commit-B
+# 2041 tigger-checkout b1
+# echo "-----------"
+# cat a
+# echo "-----------"
+# 2041 tigger-status
+# 2041 tigger-checkout master
+# echo "-----------"
+# cat a
+# echo "-----------"
+# 2041 tigger-status
