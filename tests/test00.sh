@@ -7,48 +7,61 @@
 # Testing commands:
 # - tigger-init 
 # - tigger-add 
-#
-# Usage: test00.sh <path to tigger-init> <path to tigger-add>
+# 
+# NOTE: Assumes tigger commands are added to PATH
 ######################################################################
 
 ######################################################################
-# Create output file for implemented tigger commands
+# Tigger commands to be run
 ######################################################################
 
-mkdir temp && cd temp 
+test_commands () {
 
-### TEST BEGIN ###
+    mkdir temp && cd temp
 
-../"$1" 2>&1 >> ../a 
+    # tigger-init tests
+    tigger-init # should succeed
+    tigger-init # should error => .tigger already exists
 
-### TEST END ###
+    # tigger-add tests
+    touch a b
+    tigger-add a b # should succeed
+    tigger-add c # should error => non existent file
+    rm -rf .tigger
+    tigger-add a b # should error => no .tigger present
+    tigger-add c # should error => no .tigger error > non existent file error
 
-cd .. && rm -rf temp 
+   cd .. && rm -rf temp
+
+}
 
 ######################################################################
-# Create output file for 2041 tigger commands
+# Create file with expected answers
 ######################################################################
 
-mkdir temp && cd temp 
+make_answers () {
 
-### VALIDATION BEGIN ###
+    echo "Initialized empty tigger repository in .tigger" 
+    echo "tigger-init: error: .tigger already exists" 
+    echo "tigger-add: error: can not open 'c'"
+    echo "tigger-add: error: tigger repository directory .tigger not found"
+    echo "tigger-add: error: tigger repository directory .tigger not found"
 
-2041 tigger-init 2>&1 >> ../b
-
-### VALIDATION END ###
-
-cd .. && rm -rf temp 
+}
 
 ######################################################################
 # OUtcome
 ######################################################################
+
+test_commands > a
+make_answers > b
 
 if [ -z "$(diff a b)" ]
 then 
     echo "PASSED"
 else
     echo "FAILED"
-    diff a b
+    diff a b 
 fi
 
-rm a b 
+rm a b
