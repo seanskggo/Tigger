@@ -22,8 +22,12 @@ test_commands () {
     # tigger-init tests
     tigger-init # should succeed
     tigger-init # should error => .tigger already exists
+    tigger-init asdf # should error => .tigger already exists > usage error
+    rm -rf .tigger 
+    tigger-init asdf # should error => usage error
 
     # tigger-add tests
+    tigger-init
     touch a b
     tigger-add a b # should succeed
     tigger-add c # should error => non existent file
@@ -43,6 +47,9 @@ make_answers () {
 
     echo "Initialized empty tigger repository in .tigger" 
     echo "tigger-init: error: .tigger already exists" 
+    echo "tigger-init: error: .tigger already exists" 
+    echo "usage: tigger-init"
+    echo "Initialized empty tigger repository in .tigger" 
     echo "tigger-add: error: can not open 'c'"
     echo "tigger-add: error: tigger repository directory .tigger not found"
     echo "tigger-add: error: tigger repository directory .tigger not found"
