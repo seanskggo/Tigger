@@ -25,11 +25,10 @@ make_tigger () {
 # Main
 ######################################################################
 
-check_tigger
-
 # Case 1: tigger-init
 if [ -z "$1" ]
 then    
+    check_tigger
     make_tigger
 # Default - raise usage error
 else 

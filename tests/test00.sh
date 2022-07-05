@@ -40,7 +40,7 @@ test_commands () {
     rm a 
     tigger-add a # should succeed (adding deleted file to index)
 
-   cd .. && rm -rf temp
+    cd .. && rm -rf temp
 
 }
 
@@ -48,17 +48,18 @@ test_commands () {
 # Create file with expected answers
 ######################################################################
 
+# Created from 2041 reference implementation
 make_answers () {
 
-    echo "Initialized empty tigger repository in .tigger" 
-    echo "tigger-init: error: .tigger already exists" 
-    echo "tigger-init: error: .tigger already exists" 
+    echo "Initialized empty tigger repository in .tigger"
+    echo "tigger-init: error: .tigger already exists"
     echo "usage: tigger-init"
-    echo "Initialized empty tigger repository in .tigger" 
+    echo "usage: tigger-init"
+    echo "Initialized empty tigger repository in .tigger"
     echo "tigger-add: error: can not open 'c'"
     echo "tigger-add: error: tigger repository directory .tigger not found"
     echo "tigger-add: error: tigger repository directory .tigger not found"
-    echo "Initialized empty tigger repository in .tigger" 
+    echo "Initialized empty tigger repository in .tigger"
     echo "usage: tigger-add <filenames>"
 
 }
