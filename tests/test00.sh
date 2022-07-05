@@ -34,6 +34,11 @@ test_commands () {
     rm -rf .tigger
     tigger-add a b # should error => no .tigger present
     tigger-add c # should error => no .tigger error > non existent file error
+    tigger-init
+    tigger-add # should error => usage error
+    tigger-add a # should error => usage error
+    rm a 
+    tigger-add a # should succeed (adding deleted file to index)
 
    cd .. && rm -rf temp
 
@@ -53,6 +58,8 @@ make_answers () {
     echo "tigger-add: error: can not open 'c'"
     echo "tigger-add: error: tigger repository directory .tigger not found"
     echo "tigger-add: error: tigger repository directory .tigger not found"
+    echo "Initialized empty tigger repository in .tigger" 
+    echo "usage: tigger-add <filenames>"
 
 }
 

@@ -13,6 +13,8 @@ check_tigger () {
     fi
 }
 
+# Create tigger repository
+# Usage: make_tigger
 make_tigger () {
     mkdir .tigger
     mkdir .tigger/index .tigger/message .tigger/commits

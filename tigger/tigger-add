@@ -1,22 +1,52 @@
 #!/bin/dash
 
-if [ ! -d ".tigger" ]
-then
-    echo "tigger-add: error: tigger repository directory .tigger not found"
+######################################################################
+# Helper Functions
+######################################################################
+
+# Error check: .tigger exists 
+check_tigger () {
+    if [ ! -d ".tigger" ]
+    then
+        echo "tigger-add: error: tigger repository directory .tigger not found"
+        exit 1
+    fi
+}
+
+# Add file to index
+# Usage: add_to_index <file>
+add_to_index () {
+    # If file exists, add to index
+    if [ -f "$1" ]
+    then
+        cp $1 .tigger/index
+    # If file does not exist but exists in index, remove it without error
+    elif [ ! -f "$1" ] && [ -f .tigger/index/"$1" ]
+    then    
+        rm .tigger/index/"$1"
+    # Otherwise, throw error
+    else 
+        echo "tigger-add: error: can not open '$1'"
+        exit 1
+    fi 
+}
+
+######################################################################
+# Main
+######################################################################
+
+check_tigger
+
+# Case 1: tigger-add <files...>
+if [ ! -z "$1" ]
+then    
+    for file
+    do
+        add_to_index "$file"
+    done
+# Default - raise usage error
+else 
+    echo "usage: tigger-add <filenames>"
     exit 1
 fi
 
-for file
-do
-    # If file is deleted but not from index, remove it without error
-    if [ ! -f "$file" ] && [ -f .tigger/index/"$file" ]
-    then    
-        rm .tigger/index/"$file"
-    elif [ -f "$file" ]
-    then
-        cp $file .tigger/index
-    else 
-        echo "tigger-add: error: can not open '$file'"
-        exit 1
-    fi 
-done
