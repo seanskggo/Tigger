@@ -18,6 +18,7 @@ check_tigger () {
 make_tigger () {
     mkdir .tigger
     mkdir .tigger/index .tigger/message .tigger/commits
+    touch .tigger/last_commit
     echo "Initialized empty tigger repository in .tigger"
 }
 

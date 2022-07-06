@@ -19,7 +19,19 @@ test_commands () {
     mkdir temp && cd temp
 
     # tigger-init tests
-    tigger-commit # should error => tigger does not exist
+    tigger-commit # should error => .tigger does not exist
+    tigger-commit asdf # should error => .tigger does not exist > usage error
+    tigger-init > /dev/null
+    tigger-commit # should error => usage error
+    tigger-commit asdf # should error => usage error
+    tigger-commit -m # should error => usage error
+    tigger-commit -a -m # should error => usage error
+    tigger-commit -m test # should error => nothing to commit
+
+    touch a 
+    tigger-commit -a -m test # should error => nothing to commit
+    tigger-add a 
+    tigger-commit -m test # should succeed
 
     cd .. && rm -rf temp
 
@@ -33,6 +45,14 @@ test_commands () {
 make_answers () {
 
     echo "tigger-commit: error: tigger repository directory .tigger not found"
+    echo "tigger-commit: error: tigger repository directory .tigger not found"
+    echo "usage: tigger-commit [-a] -m commit-message"
+    echo "usage: tigger-commit [-a] -m commit-message"
+    echo "usage: tigger-commit [-a] -m commit-message"
+    echo "usage: tigger-commit [-a] -m commit-message"
+    echo "nothing to commit"
+    echo "nothing to commit"
+    echo "Committed as commit 0"
 
 }
 
