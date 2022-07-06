@@ -29,10 +29,14 @@ get_last_commit () {
 # Usage: check_last_commit_diff 
 check_last_commit_diff () {
     last_commit=$(get_last_commit)
-    if [ "$last_commit" -ge 0 ] && [ -z "$(diff -r .tigger/commits/"$last_commit" .tigger/index)" ] || [ "$last_commit" -eq -1 ] && [ -z "$(ls .tigger/index)" ]
+    if [ "$last_commit" -ge 0 ] && [ -z "$(diff -r .tigger/commits/"$last_commit" .tigger/index)" ]
     then 
         echo "nothing to commit"
         exit 1
+    elif [ "$last_commit" -eq -1 ] && [ -z "$(ls .tigger/index)" ]
+    then
+        echo "nothing to commit"
+        exit 1         
     fi
 }
 
@@ -58,7 +62,7 @@ add_to_index () {
     do
         if [ -f "$index_file" ] 
         then
-            file=$(echo "$index_file | sed -E 's/.tigger\/index\/(.*)/\1/'")
+            file=$(echo "$index_file" | sed -E 's/.tigger\/index\/(.*)/\1/')
             if [ ! -f "$file" ]
             then
                 echo "tigger-commit: error: can not open '$file'"

@@ -32,6 +32,24 @@ test_commands () {
     tigger-commit -a -m test # should error => nothing to commit
     tigger-add a 
     tigger-commit -m test # should succeed
+    tigger-commit -a -m test # should error => nothing to commit
+    echo 'changed' > a
+    tigger-commit -m test # should error => nothing to commit
+    tigger-commit -a -m test # should succeed
+
+    touch b
+    tigger-add b 
+    tigger-commit -a -m test # should succeed
+    tigger-commit -m test # should error => nothing to commit
+
+    rm -rf .tigger && rm *
+    tigger-init > /dev/null
+    touch b
+    tigger-add b 
+    tigger-commit -m test # should succeed
+    echo "changed" >> b
+    tigger-commit -m test # should error => nothing to commit
+    tigger-commit -a -m test # should succeed
 
     cd .. && rm -rf temp
 
@@ -53,6 +71,14 @@ make_answers () {
     echo "nothing to commit"
     echo "nothing to commit"
     echo "Committed as commit 0"
+    echo "nothing to commit"
+    echo "nothing to commit"
+    echo "Committed as commit 1"
+    echo "Committed as commit 2"
+    echo "nothing to commit"
+    echo "Committed as commit 0"
+    echo "nothing to commit"
+    echo "Committed as commit 1"
 
 }
 
