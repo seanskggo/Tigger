@@ -1,19 +1,50 @@
 #!/bin/dash
 
-# Error check: .tigger exists
-if [ ! -d ".tigger" ]
-then
-    echo "tigger-log: error: tigger repository directory .tigger not found"
+######################################################################
+# Helper Functions
+######################################################################
+
+# Error check: .tigger exists 
+check_tigger () {
+    if [ ! -d ".tigger" ]
+    then
+        echo "tigger-log: error: tigger repository directory .tigger not found"
+        exit 1
+    fi
+}
+
+# Print log
+# Usage: print_log 
+print_log () {
+    log=''
+    for commit in .tigger/commits/*
+    do
+        if [ "$commit" != ".tigger/commits/*" ]
+        then 
+            index=$(echo "$commit" | sed -E 's/.tigger\/commits\/([0-9])/\1/')
+            message=$(cat .tigger/message/"$index")
+            log="$log,$index $message"
+        fi
+    done 
+    if [ ! -z "$log" ]
+    then
+        echo "$log" | cut -d',' -f2- | tr ',' '\n' | sort  -r
+    fi
+}
+
+######################################################################
+# Main
+######################################################################
+
+check_tigger
+
+# Case 1: tigger-log
+if [ -z "$1" ]
+then    
+    print_log
+# Default - raise usage error
+else 
+    echo "usage: tigger-log"
     exit 1
 fi
 
-log=''
-
-for commit in .tigger/[0-9]
-do
-    index=$(echo "$commit" | sed -E 's/.tigger\/([0-9])/\1/')
-    message=$(cat .tigger/message/"$index")
-    log="$log,$index $message"
-done 
-
-echo "$log" | cut -d',' -f2- | tr ',' '\n' | sort  -r

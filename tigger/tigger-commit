@@ -86,7 +86,7 @@ if [ "$1" = "-a" ] && [ "$2" = "-m" ] && [ ! -z "$3" ]
 then    
     add_to_index
     check_last_commit_diff
-    commit "$new_commit" "$2"
+    commit "$new_commit" "$3"
 # Case 2: tigger-commit -m <message>
 elif [ "$1" = "-m" ] && [ ! -z "$2" ]
 then
