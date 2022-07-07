@@ -51,16 +51,30 @@ test_commands () {
 # Created from 2041 reference implementation
 make_answers () {
 
-    echo "Initialized empty tigger repository in .tigger"
-    echo "tigger-init: error: .tigger already exists"
-    echo "usage: tigger-init"
-    echo "usage: tigger-init"
-    echo "Initialized empty tigger repository in .tigger"
-    echo "tigger-add: error: can not open 'c'"
-    echo "tigger-add: error: tigger repository directory .tigger not found"
-    echo "tigger-add: error: tigger repository directory .tigger not found"
-    echo "Initialized empty tigger repository in .tigger"
-    echo "usage: tigger-add <filenames>"
+    mkdir temp && cd temp
+
+    # tigger-init tests
+    2041 tigger-init 
+    2041 tigger-init 
+    2041 tigger-init asdf 
+    rm -rf .tigger 
+    2041 tigger-init asdf 
+
+    # tigger-add tests
+    2041 tigger-init
+    touch a b
+    2041 tigger-add a b 
+    2041 tigger-add c 
+    rm -rf .tigger
+    2041 tigger-add a b 
+    2041 tigger-add c 
+    2041 tigger-init
+    2041 tigger-add 
+    2041 tigger-add a 
+    rm a 
+    2041 tigger-add a 
+
+    cd .. && rm -rf temp
 
 }
 
@@ -68,8 +82,8 @@ make_answers () {
 # Outcome
 ######################################################################
 
-test_commands > a
-make_answers > b
+test_commands > a 2>&1
+make_answers > b 2>&1
 
 if [ -z "$(diff a b)" ]
 then 
