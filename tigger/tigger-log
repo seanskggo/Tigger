@@ -28,7 +28,7 @@ print_log () {
     done 
     if [ ! -z "$log" ]
     then
-        echo "$log" | cut -d',' -f2- | tr ',' '\n' | sort  -r
+        echo "$log" | cut -d',' -f2- | tr ',' '\n' | sort  -nr
     fi
 }
 
