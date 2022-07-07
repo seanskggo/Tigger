@@ -129,7 +129,8 @@ then
     echo "PASSED"
 else
     echo "FAILED"
-    diff a b 
+    diff a b
+    # diff -y a b | cat -n | grep -v -e '($'  
 fi
 
 rm a b

@@ -85,13 +85,13 @@ check_if_staged () {
         # Case 3: file in index and dir different
         elif [ "$INDEX_FILE" != "$DIR_FILE" ]
         then 
-            echo "tigger-rm: error: '"$1"' has staged changes in the index"
-            echo_err 1
+            echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
+            exit 1
         # Case 4: file in index and commit different
         elif [ "$INDEX_FILE" != "$COMMIT_FILE" ]
         then 
-            echo "tigger-rm: error: '"$1"' has staged changes in the index"
-            echo_err 1
+            echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
+            exit 1
         # Case 5: file all the same => do not raise error
         fi
     fi
