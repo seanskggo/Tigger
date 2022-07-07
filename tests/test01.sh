@@ -2,7 +2,7 @@
 
 ######################################################################
 # Test Script No. 1
-# Subset 0 
+# Subset 0 & 1
 # 
 # Testing commands:
 # - tigger-commit
