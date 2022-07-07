@@ -62,32 +62,49 @@ test_commands () {
 # Created from 2041 reference implementation
 make_answers () {
 
-    echo "tigger-commit: error: tigger repository directory .tigger not found"
-    echo "tigger-commit: error: tigger repository directory .tigger not found"
-    echo "usage: tigger-commit [-a] -m commit-message"
-    echo "usage: tigger-commit [-a] -m commit-message"
-    echo "usage: tigger-commit [-a] -m commit-message"
-    echo "usage: tigger-commit [-a] -m commit-message"
-    echo "nothing to commit"
-    echo "nothing to commit"
-    echo "Committed as commit 0"
-    echo "nothing to commit"
-    echo "nothing to commit"
-    echo "Committed as commit 1"
-    echo "Committed as commit 2"
-    echo "nothing to commit"
-    echo "Committed as commit 0"
-    echo "nothing to commit"
-    echo "Committed as commit 1"
+    mkdir temp && cd temp
 
+    2041 tigger-commit 
+    2041 tigger-commit asdf 
+    2041 tigger-init > /dev/null
+    2041 tigger-commit 
+    2041 tigger-commit asdf 
+    2041 tigger-commit -m 
+    2041 tigger-commit -a -m 
+    2041 tigger-commit -m test 
+
+    touch a 
+    2041 tigger-commit -a -m test 
+    2041 tigger-add a 
+    2041 tigger-commit -m test 
+    2041 tigger-commit -a -m test 
+    echo 'changed' > a
+    2041 tigger-commit -m test 
+    2041 tigger-commit -a -m test 
+
+    touch b
+    2041 tigger-add b 
+    2041 tigger-commit -a -m test 
+    2041 tigger-commit -m test 
+
+    rm -rf .tigger && rm *
+    2041 tigger-init > /dev/null
+    touch b
+    2041 tigger-add b 
+    2041 tigger-commit -m test 
+    echo "changed" >> b
+    2041 tigger-commit -m test 
+    2041 tigger-commit -a -m test
+
+    cd .. && rm -rf temp
 }
 
 ######################################################################
 # Outcome
 ######################################################################
 
-test_commands > a
-make_answers > b
+test_commands > a 2>&1
+make_answers > b 2>&1
 
 if [ -z "$(diff a b)" ]
 then 
