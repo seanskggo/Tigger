@@ -59,23 +59,39 @@ test_commands () {
 # Created from 2041 reference implementation
 make_answers () {
 
-    echo "tigger-log: error: tigger repository directory .tigger not found"
-    echo "tigger-log: error: tigger repository directory .tigger not found"
-    echo "usage: tigger-log"
-    echo "0 test"
-    echo "1 test2"
-    echo "0 test"
-    echo "10 count test 10"
-    echo "9 count test 9"
-    echo "8 count test 8"
-    echo "7 count test 7"
-    echo "6 count test 6"
-    echo "5 count test 5"
-    echo "4 count test 4"
-    echo "3 count test 3"
-    echo "2 count test 2"
-    echo "1 count test 1"
-    echo "0 count test 0"
+    mkdir temp && cd temp
+
+    2041 tigger-log 
+    2041 tigger-log test 
+    2041 tigger-init > /dev/null
+    2041 tigger-log test 
+    2041 tigger-log 
+
+    touch a 
+    2041 tigger-add a
+    2041 tigger-commit -m test > /dev/null
+    2041 tigger-log 
+
+    touch b
+    2041 tigger-add b
+    2041 tigger-commit -m test2 > /dev/null
+    2041 tigger-log 
+
+    rm -rf .tigger && rm *
+    2041 tigger-init > /dev/null
+
+    count=0
+    while [ "$count" -le 10 ]
+    do 
+        touch "$count"
+        2041 tigger-add "$count"
+        2041 tigger-commit -m "count test $count" > /dev/null
+        count=$((count + 1))
+    done
+
+    2041 tigger-log 
+
+    cd .. && rm -rf temp
 
 }
 
@@ -83,8 +99,8 @@ make_answers () {
 # Outcome
 ######################################################################
 
-test_commands > a
-make_answers > b
+test_commands > a 2>&1
+make_answers > b 2>&1
 
 if [ -z "$(diff a b)" ]
 then 
