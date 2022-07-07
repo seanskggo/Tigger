@@ -4,11 +4,17 @@
 # Helper Functions
 ######################################################################
 
+# Print to stderr
+# Usage: echo_err <message>
+echo_err() { 
+    echo "$@" 1>&2
+}
+
 # Error check: .tigger exists 
 check_tigger () {
     if [ -d ".tigger" ]
     then
-        echo "tigger-init: error: .tigger already exists"
+        echo_err "tigger-init: error: .tigger already exists"
         exit 1
     fi
 }
@@ -33,7 +39,7 @@ then
     make_tigger
 # Default - raise usage error
 else 
-    echo "usage: tigger-init"
+    echo_err "usage: tigger-init"
     exit 1
 fi
 
