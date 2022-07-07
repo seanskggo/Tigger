@@ -4,11 +4,26 @@
 # Helper Functions
 ######################################################################
 
+# Print to stderr
+# Usage: echo_err <message>
+echo_err() { 
+    echo "$@" 1>&2
+}
+
+# Error check: .tigger exists
+check_tigger () {
+    if [ ! -d ".tigger" ]
+    then
+        echo_err "tigger-rm: error: tigger repository directory .tigger not found"
+        exit 1
+    fi
+}
+
 # Check if file is in tigger index
 check_file_in_index () {
     if [ ! -f .tigger/index/"$1" ]
     then
-        echo "tigger-rm: error: '"$1"' is not in the tigger repository"
+        echo_err "tigger-rm: error: '"$1"' is not in the tigger repository"
         exit 1
     fi
 }
@@ -106,15 +121,6 @@ safe_delete () {
     done
 }
 
-# Error check: .tigger exists
-check_tigger () {
-    if [ ! -d ".tigger" ]
-    then
-        echo "tigger-rm: error: tigger repository directory .tigger not found"
-        exit 1
-    fi
-}
-
 ######################################################################
 # Main
 ######################################################################
@@ -123,21 +129,44 @@ check_tigger () {
 check_tigger
 
 # Case 1: tigger-rm --force --cached filenames...
-if [ "$1" = "--force" ] && [ "$2" = "--cached" ] && [ ! -z "$3" ]
+if [ "$1" = "--force" ] && [ "$2" = "--cached" ]
 then    
-    shift 2
-    cache_delete "$@"
+    if [ ! -z "$3" ]
+    then 
+        shift 2
+        cache_delete "$@"
+    else 
+        echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
+        exit 1
+    fi 
 # Case 2: tigger-rm --force filenames...
-elif [ "$1" = "--force" ] && [ ! -z "$2" ]
+elif [ "$1" = "--force" ]
 then
-    shift 1
-    full_delete "$@"
+    if [ ! -z "$2" ]
+    then 
+        shift 1
+        full_delete "$@"
+    else
+        echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
+        exit 1
+    fi
 # Case 3: tigger-rm --cached filenames...
-elif [ "$1" = "--cached" ] && [ ! -z "$2" ]
+elif [ "$1" = "--cached" ]
 then
-    shift 1
-    safe_cache_delete "$@"
-# Case 4: tigger-rm filenames...
+    if [ ! -z "$2" ]
+    then
+        shift 1
+        safe_cache_delete "$@"
+    else
+        echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
+        exit 1
+    fi
+# Case 4: tigger-rm 
+elif [ -z "$1" ]
+then 
+    echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
+    exit 1
+# Case 5: tigger-rm filenames...
 else 
     safe_delete "$@"
 fi
