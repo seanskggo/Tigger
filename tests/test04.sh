@@ -21,15 +21,15 @@ test_commands () {
     tigger-rm # should error => .tigger does not exist > usage error
     tigger-rm test # should error => .tigger does not exist > unknown file
     tigger-init > /dev/null                         
-    tigger-rm                                       
-    tigger-rm --force                               
-    tigger-rm --force --cached                      
-    tigger-rm a                                     
+    tigger-rm # should error => usage error              
+    tigger-rm --force # should error => usage error         
+    tigger-rm --force --cached # should error => usage error 
 
+    tigger-rm a # should error => file not in repository
     touch a                                         
-    tigger-rm a                                     
-    tigger-add a                                    
-    tigger-rm a                                     
+    tigger-rm a # should error => file not in repository
+    tigger-add a                                     
+    tigger-rm a # should error => file not in repository                               
     tigger-commit -m test > /dev/null               
     tigger-rm a # should succeed
     tigger-rm a # should fail after removal
