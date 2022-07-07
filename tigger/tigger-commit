@@ -4,11 +4,17 @@
 # Helper Functions
 ######################################################################
 
+# Print to stderr
+# Usage: echo_err <message>
+echo_err() { 
+    echo "$@" 1>&2
+}
+
 # Error check: .tigger exists 
 check_tigger () {
     if [ ! -d ".tigger" ]
     then
-        echo "tigger-commit: error: tigger repository directory .tigger not found"
+        echo_err "tigger-commit: error: tigger repository directory .tigger not found"
         exit 1
     fi
 }
@@ -31,11 +37,11 @@ check_last_commit_diff () {
     last_commit=$(get_last_commit)
     if [ "$last_commit" -ge 0 ] && [ -z "$(diff -r .tigger/commits/"$last_commit" .tigger/index)" ]
     then 
-        echo "nothing to commit"
+        echo_err "nothing to commit"
         exit 1
     elif [ "$last_commit" -eq -1 ] && [ -z "$(ls .tigger/index)" ]
     then
-        echo "nothing to commit"
+        echo_err "nothing to commit"
         exit 1         
     fi
 }
@@ -65,7 +71,7 @@ add_to_index () {
             file=$(echo "$index_file" | sed -E 's/.tigger\/index\/(.*)/\1/')
             if [ ! -f "$file" ]
             then
-                echo "tigger-commit: error: can not open '$file'"
+                echo_err "tigger-commit: error: can not open '$file'"
                 exit 1
             fi
             cp "$file" .tigger/index
@@ -94,7 +100,7 @@ then
     commit "$new_commit" "$2"
 # Default - raise usage error
 else 
-    echo "usage: tigger-commit [-a] -m commit-message"
+    echo_err "usage: tigger-commit [-a] -m commit-message"
     exit 1
 fi
 
