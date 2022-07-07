@@ -4,12 +4,18 @@
 # Helper Functions
 ######################################################################
 
+# Print to stderr
+# Usage: echo_err <message>
+echo_err() { 
+    echo "$@" 1>&2
+}
+
 # Error check: .tigger exists 
 # Usage: check_tigger
 check_tigger () {
     if [ ! -d ".tigger" ]
     then
-        echo "tigger-show: error: tigger repository directory .tigger not found"
+        echo_err "tigger-show: error: tigger repository directory .tigger not found"
         exit 1
     fi
 }
@@ -19,7 +25,7 @@ check_tigger () {
 check_commit_exists () {
     if [ ! -d .tigger/commits/"$1" ]
     then
-        echo "tigger-show: error: unknown commit '$1'"
+        echo_err "tigger-show: error: unknown commit '$1'"
         exit 1
     fi
 }
@@ -29,7 +35,7 @@ check_commit_exists () {
 check_file_exists_in_index () {
     if [ ! -f .tigger/index/"$1" ]
     then
-        echo "tigger-show: error: '"$1"' not found in index"
+        echo_err "tigger-show: error: '"$1"' not found in index"
         exit 1
     fi
 }
@@ -39,7 +45,7 @@ check_file_exists_in_index () {
 check_file_exists_in_commit () {
     if [ ! -f .tigger/commits/"$1"/"$2" ]
     then
-        echo "tigger-show: error: '$2' not found in commit $1"
+        echo_err "tigger-show: error: '$2' not found in commit $1"
         exit 1
     fi
 }
@@ -51,7 +57,7 @@ check_if_object_is_valid () {
     *:*)
         ;;
     *)
-        echo "tigger-show: error: invalid object $1"
+        echo_err "tigger-show: error: invalid object $1"
         exit 1
         ;;
     esac
@@ -62,7 +68,7 @@ check_if_object_is_valid () {
 check_filename_is_valid () {
     if [ -z "$1" ]
     then 
-        echo "tigger-show: error: invalid filename '"$1"'"
+        echo_err "tigger-show: error: invalid filename '"$1"'"
         exit 1
     fi
 }
@@ -92,7 +98,7 @@ then
     fi
 # Default - raise usage error
 else 
-    echo "usage: tigger-show <commit>:<filename>"
+    echo_err "usage: tigger-show <commit>:<filename>"
     exit 1
 fi
 
