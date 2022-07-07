@@ -47,8 +47,8 @@ make_answers () {
     
     mkdir temp && cd temp
 
-    2041 tigger-rm # should error => .tigger does not exist > usage error
-    2041 tigger-rm test # should error => .tigger does not exist > unknown file
+    2041 tigger-rm 
+    2041 tigger-rm test 
     2041 tigger-init > /dev/null                         
     2041 tigger-rm                                       
     2041 tigger-rm --force                               
@@ -60,8 +60,8 @@ make_answers () {
     2041 tigger-add a                                    
     2041 tigger-rm a                                     
     2041 tigger-commit -m test > /dev/null               
-    2041 tigger-rm a # should succeed
-    2041 tigger-rm a # should fail after removal
+    2041 tigger-rm a 
+    2041 tigger-rm a 
 
     cd .. && rm -rf temp
 
