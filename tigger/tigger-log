@@ -4,11 +4,17 @@
 # Helper Functions
 ######################################################################
 
+# Print to stderr
+# Usage: echo_err <message>
+echo_err() { 
+    echo "$@" 1>&2
+}
+
 # Error check: .tigger exists 
 check_tigger () {
     if [ ! -d ".tigger" ]
     then
-        echo "tigger-log: error: tigger repository directory .tigger not found"
+        echo_err "tigger-log: error: tigger repository directory .tigger not found"
         exit 1
     fi
 }
@@ -44,7 +50,7 @@ then
     print_log
 # Default - raise usage error
 else 
-    echo "usage: tigger-log"
+    echo_err "usage: tigger-log"
     exit 1
 fi
 
