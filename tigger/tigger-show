@@ -1,59 +1,98 @@
 #!/bin/dash
 
-# Error check: .tigger exists
-if [ ! -d ".tigger" ]
-then
-    echo "tigger-show: error: tigger repository directory .tigger not found"
-    exit 1
-fi
+######################################################################
+# Helper Functions
+######################################################################
 
-#Error check: commit has 1 argument
-if [ "$#" -ne 1 ] 
-then 
-    echo "usage: tigger-show <commit>:<filename>"
-    exit 1
-fi
-
-commit=$(echo $1 | cut -d':' -f1)
-filename=$(echo $1 | cut -d':' -f2)
-
-# Error check: commit exists
-if [ ! -d ".tigger/$commit" ]
-then
-    echo "tigger-show: error: unknown commit '$commit'"
-    exit 1
-fi
-
-if [ -z "$filename" ] 
-then
-    echo "usage: tigger-show <commit>:<filename>"
-    exit 1
-fi
-
-if [ -z "$commit" ] 
-then    
-
-    # Error check: file exists in index
-    if [ ! -f .tigger/index/"$filename" ]
+# Error check: .tigger exists 
+# Usage: check_tigger
+check_tigger () {
+    if [ ! -d ".tigger" ]
     then
-        echo "tigger-show: error: '$filename' not found in index"
+        echo "tigger-show: error: tigger repository directory .tigger not found"
         exit 1
     fi
+}
 
-    cat .tigger/index/"$filename"
+# Check commit exists
+# Usage: check_commit_exists <commit>
+check_commit_exists () {
+    if [ ! -d .tigger/commits/"$1" ]
+    then
+        echo "tigger-show: error: unknown commit '$1'"
+        exit 1
+    fi
+}
 
+# Check file exists in index
+# Usage: check_file_exists_in_index <filename>
+check_file_exists_in_index () {
+    if [ ! -f .tigger/index/"$1" ]
+    then
+        echo "tigger-show: error: '"$1"' not found in index"
+        exit 1
+    fi
+}
+
+# Check file exists in commit
+# Usage: check_file_exists_in_commit <commit> <filename>
+check_file_exists_in_commit () {
+    if [ ! -f .tigger/commits/"$1"/"$2" ]
+    then
+        echo "tigger-show: error: '$2' not found in commit $1"
+        exit 1
+    fi
+}
+
+# Check if the first parameter is of the form <commit>:<filename>
+# Usage: check_if_object_is_valid <object>
+check_if_object_is_valid () {
+    case "$1" in
+    *:*)
+        ;;
+    *)
+        echo "tigger-show: error: invalid object $1"
+        exit 1
+        ;;
+    esac
+}
+
+# Check if filename is valid
+# Usage: check_filename_is_valid <filename>
+check_filename_is_valid () {
+    if [ -z "$1" ]
+    then 
+        echo "tigger-show: error: invalid filename '"$1"'"
+        exit 1
+    fi
+}
+
+######################################################################
+# Main
+######################################################################
+
+check_tigger
+
+# Case 1: tigger-show <object>
+if [ "$#" = 1 ] 
+then        
+    check_if_object_is_valid "$1"
+    commit=$(echo "$1" | cut -d':' -f1)
+    filename=$(echo "$1" | cut -d':' -f2)
+    if [ -z "$commit" ] 
+    then 
+        check_filename_is_valid "$filename"
+        check_file_exists_in_index "$filename"
+        cat .tigger/index/"$filename"
+    else
+        check_commit_exists "$commit"
+        check_filename_is_valid "$filename"
+        check_file_exists_in_commit "$commit" "$filename"
+        cat .tigger/commits/"$commit"/"$filename"
+    fi
+# Default - raise usage error
 else 
-
-    # Error check: file exists in commit
-    if [ ! -f .tigger/"$commit"/"$filename" ]
-    then
-        echo "tigger-show: error: '$filename' not found in commit $commit"
-        exit 1
-    fi
-    
-    cat .tigger/"$commit"/"$filename"
-
+    echo "usage: tigger-show <commit>:<filename>"
+    exit 1
 fi
-
-
 
