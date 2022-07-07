@@ -19,7 +19,20 @@ check_tigger () {
     fi
 }
 
+# Get last commit number if there is one otherwise return -1
+# Usage: get_last_commit
+get_last_commit () {
+    last_commit=$(ls .tigger/commits | tr ' ' '\n' | tail -n 1)
+    if [ -z "$last_commit" ]
+    then 
+        echo "-1"
+    else
+        echo "$last_commit"
+    fi
+}
+
 # Check if file is in tigger index
+# Usage: check_file_in_index <filename>
 check_file_in_index () {
     if [ ! -f .tigger/index/"$1" ]
     then
@@ -28,29 +41,53 @@ check_file_in_index () {
     fi
 }
 
+# Throws usage error if given variable is empty
+# Usage: throw_usage_error_if_empty <arg>
+throw_usage_error_if_empty () {
+    if [ -z "$1" ]
+    then 
+        echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
+        exit 1
+    fi 
+}
+
 # Throw error if there is any staging differences
 # Usage: check_if_staged <filename>
 check_if_staged () {
-    # added, committed, changed - tigger-rm: error: 'file' in the repository is different to the working file
-    if [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ ! -z "$(diff "$1" .tigger/index/"$1")" ] && [ -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
-    then
-        echo "tigger-rm: error: '"$1"' in the repository is different to the working file"
-        exit 1
-    # added, committed, changed, added, changed - tigger-rm: error: 'file' in index is different to both the working file and the repository
-    elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ ! -z "$(diff "$1" .tigger/index/"$1")" ] && [ ! -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
-    then
-        echo "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
-        exit 1
-    # added, committed, changed - "tigger-rm: error: 'file' has staged changes in the index
-    elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ -z "$(diff "$1" .tigger/index/"$1")" ] && [ ! -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
-    then
-        echo "tigger-rm: error: '"$1"' has staged changes in the index"
-        exit 1
-    # added - tigger-rm: error: 'file' has staged changes in the index
-    elif [ ! -f .tigger/last_commit ] || [ ! -f .tigger/$(cat .tigger/last_commit)/"$1" ]
+
+    commit=$(get_last_commit)
+
+    # If there are no commits, immediately throw error
+    if [ "$commit" -eq -1 ] || [ ! -f .tigger/commits/"$commit"/"$1" ]
     then 
-        echo "tigger-rm: error: '"$1"' has staged changes in the index"
+        echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
         exit 1
+    else
+        COMMIT_FILE=".tigger/commits/"$commit"/"$1""
+        INDEX_FILE=".tigger/index/"$1""
+        DIR_FILE="$1"
+        # Case 1: file in index, commit and dir all different
+        if [ ! -z $(diff "$COMMIT_FILE" "$INDEX_FILE") ] && [ ! -z $(diff "$COMMIT_FILE" "$DIR_FILE") ] && [ ! -z $(diff "$INDEX_FILE" "$DIR_FILE") ]
+        then
+            echo_err "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
+            exit 1
+        # Case 2: file in commit and dir different
+        elif [ ! -z $(diff "$COMMIT_FILE" "$DIR_FILE") ]
+        then 
+            echo_err "tigger-rm: error: '"$1"' in the repository is different to the working file"
+            exit 1
+        # Case 3: file in index and dir different
+        elif [ ! -z $(diff "$INDEX_FILE" "$DIR_FILE") ]
+        then 
+            echo "tigger-rm: error: '"$1"' has staged changes in the index"
+            echo_err 1
+        # Case 4: file in index and commit different
+        elif [ ! -z $(diff "$INDEX_FILE" "$COMMIT_FILE") ]
+        then 
+            echo "tigger-rm: error: '"$1"' has staged changes in the index"
+            echo_err 1
+        # Case 5: file all the same => do not raise error
+        fi
     fi
 }
 
@@ -70,47 +107,63 @@ check_if_staged_cached () {
     fi
 }
 
-# Delete file from index and current repository
-# Usage: full_delete <filenames...>    
-full_delete () {
-    for file
-    do 
+######################################################################
+# Main
+######################################################################
+
+##########################
+# Error Check & Preamble #
+##########################
+
+# .tigger check
+check_tigger
+
+# If first argument is empty, throw usage error
+throw_usage_error_if_empty "$1"
+
+# Shift arguments and usage error check
+if [ "$1" = "--force" ] && [ "$2" = "--cached" ]
+then    
+    throw_usage_error_if_empty "$3"
+    shift 2
+elif [ "$1" = "--force" ]
+then
+    throw_usage_error_if_empty "$2"
+    shift 1
+elif [ "$1" = "--cached" ]
+then
+    throw_usage_error_if_empty "$2"
+    shift 1
+fi
+
+################
+# Remove Files #
+################
+
+for file in "$@"
+do 
+    # Case 1: tigger-rm --force --cached filenames...
+    if [ "$1" = "--force" ] && [ "$2" = "--cached" ]
+    then    
+        check_file_in_index "$file"
+        rm .tigger/index/"$file"
+    # Case 2: tigger-rm --force filenames...
+    elif [ "$1" = "--force" ]
+    then
         check_file_in_index "$file"
         rm .tigger/index/"$file"
         if [ -f "$file" ]
         then
             rm "$file"
         fi
-    done
-}
-
-# Delete file from tigger cache/index
-# Usage: cache_delete <filenames...>
-cache_delete () {
-    for file
-    do 
-        check_file_in_index "$file"
-        rm .tigger/index/"$file"
-    done
-}
-
-# Delete file from tigger cache/index safely
-# Usage: safe_cache_delete <filenames...>
-safe_cache_delete () {
-    for file
-    do 
+    # Case 3: tigger-rm --cached filenames...
+    elif [ "$1" = "--cached" ]
+    then
         check_file_in_index "$file"
         check_if_staged_cached "$file"
         rm .tigger/index/"$file"
-    done
-}
-
-
-# Delete file from index and current repository with safety check
-# Usage: safe_delete <filenames...>    
-safe_delete () {
-    for file
-    do 
+    # Case 4: tigger-rm filenames...
+    else 
         check_file_in_index "$file" 
         check_if_staged "$file"
         rm .tigger/index/"$file"
@@ -118,55 +171,5 @@ safe_delete () {
         then
             rm "$file"
         fi
-    done
-}
-
-######################################################################
-# Main
-######################################################################
-
-# Error check
-check_tigger
-
-# Case 1: tigger-rm --force --cached filenames...
-if [ "$1" = "--force" ] && [ "$2" = "--cached" ]
-then    
-    if [ ! -z "$3" ]
-    then 
-        shift 2
-        cache_delete "$@"
-    else 
-        echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
-        exit 1
-    fi 
-# Case 2: tigger-rm --force filenames...
-elif [ "$1" = "--force" ]
-then
-    if [ ! -z "$2" ]
-    then 
-        shift 1
-        full_delete "$@"
-    else
-        echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
-        exit 1
     fi
-# Case 3: tigger-rm --cached filenames...
-elif [ "$1" = "--cached" ]
-then
-    if [ ! -z "$2" ]
-    then
-        shift 1
-        safe_cache_delete "$@"
-    else
-        echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
-        exit 1
-    fi
-# Case 4: tigger-rm 
-elif [ -z "$1" ]
-then 
-    echo_err "usage: tigger-rm [--force] [--cached] <filenames>"
-    exit 1
-# Case 5: tigger-rm filenames...
-else 
-    safe_delete "$@"
-fi
+done
