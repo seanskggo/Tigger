@@ -4,11 +4,17 @@
 # Helper Functions
 ######################################################################
 
+# Print to stderr
+# Usage: echo_err <message>
+echo_err() { 
+    echo "$@" 1>&2
+}
+
 # Error check: .tigger exists 
 check_tigger () {
     if [ ! -d ".tigger" ]
     then
-        echo "tigger-add: error: tigger repository directory .tigger not found"
+        echo_err "tigger-add: error: tigger repository directory .tigger not found"
         exit 1
     fi
 }
@@ -26,7 +32,7 @@ add_to_index () {
         rm .tigger/index/"$1"
     # Otherwise, throw error
     else 
-        echo "tigger-add: error: can not open '$1'"
+        echo_err "tigger-add: error: can not open '$1'"
         exit 1
     fi 
 }
@@ -46,7 +52,7 @@ then
     done
 # Default - raise usage error
 else 
-    echo "usage: tigger-add <filenames>"
+    echo_err "usage: tigger-add <filenames>"
     exit 1
 fi
 
