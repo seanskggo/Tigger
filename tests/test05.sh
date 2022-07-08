@@ -23,6 +23,17 @@ test_commands () {
     tigger-init > /dev/null
     tigger-status # should succeed
 
+    # Case 4: index and commit exists
+    rm -rf .tigger && rm -f * && tigger-init > /dev/null
+    touch a
+    tigger-add a
+    tigger-commit -m test > /dev/null
+    rm a
+    tigger-status # index == commit
+    echo "changed" > a
+    tigger-add a
+    rm a
+    tigger-status # index != commit
     # Case 5: dir exists
     rm -rf .tigger && rm -f * && tigger-init > /dev/null
     touch a
@@ -67,7 +78,16 @@ make_answers () {
     # Case 3: dir and commit exists
 
     # Case 4: index and commit exists
-
+    rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
+    touch a
+    2041 tigger-add a
+    2041 tigger-commit -m test > /dev/null
+    rm a
+    2041 tigger-status # index == commit
+    echo "changed" > a
+    2041 tigger-add a
+    rm a
+    2041 tigger-status # index != commit
     # Case 5: dir exists
     rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
     touch a
@@ -103,7 +123,8 @@ then
     echo "PASSED"
 else
     echo "FAILED"
-    diff a b 
+    diff -y a b | cat -n | grep -v -e '($'  
+    # diff a b 
 fi
 
 rm a b
