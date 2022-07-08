@@ -1,0 +1,11 @@
+#!/bin/bash
+
+mkdir temp_submit 
+cp -r tigger/* temp_submit 
+cp -r tests/* temp_submit 
+cd temp_submit 
+ls 
+
+give cs2041 ass1_tigger tigger-* test??.sh
+
+cd .. && rm -rf temp_submit 
