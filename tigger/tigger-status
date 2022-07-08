@@ -118,7 +118,12 @@ print_status () {
         # Case 3: dir and commit exists
         elif [ "$DIR" != 0 ] && [ "$INDEX" = 0 ] && [ "$COMMIT" != 0 ]
         then
-            :
+            if [ "$DIR" = "$COMMIT" ]
+            then 
+                :
+            else
+                :
+            fi
         # Case 4: index and commit exists
         elif [ "$DIR" = 0 ] && [ "$INDEX" != 0 ] && [ "$COMMIT" != 0 ]
         then

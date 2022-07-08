@@ -76,7 +76,14 @@ make_answers () {
     # Case 2: dir and index exists
 
     # Case 3: dir and commit exists
-
+    rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
+    touch a
+    2041 tigger-add a
+    2041 tigger-commit -m test
+    rm a
+    tigger-add a
+    touch a
+    2041 tigger-status # dir == commit
     # Case 4: index and commit exists
     rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
     touch a
@@ -123,8 +130,8 @@ then
     echo "PASSED"
 else
     echo "FAILED"
-    diff -y a b | cat -n | grep -v -e '($'  
-    # diff a b 
+    # diff -y a b | cat -n | grep -v -e '($'  
+    diff a b 
 fi
 
 rm a b
