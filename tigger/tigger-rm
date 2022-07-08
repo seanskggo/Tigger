@@ -57,7 +57,7 @@ check_if_staged () {
 
     commit=$(get_last_commit)
 
-    # If file does not exist, return 
+    # If file does not exist, pass check
     if [ ! -f "$1" ]
     then
         return 
@@ -72,27 +72,44 @@ check_if_staged () {
         COMMIT_FILE="$(cat .tigger/commits/"$commit"/"$1")"
         INDEX_FILE="$(cat .tigger/index/"$1")"
         DIR_FILE="$(cat "$1")"
-        # Case 1: file in index, commit and dir all different
+        # Case 1: all files different
         if [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ]
         then
             echo_err "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
             exit 1
-        # Case 2: file in commit and dir different
-        elif [ "$COMMIT_FILE" != "$DIR_FILE" ]
+        # Case 2: only commit and index file different. In theory, this case is NOT possible but we will throw error for good measure
+        elif [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" = "$DIR_FILE" ] && [ "$INDEX_FILE" = "$DIR_FILE" ] 
+        then 
+            echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
+            exit 1
+        # Case 3: file in commit different to others
+        elif [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" = "$DIR_FILE" ] 
+        then 
+            echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
+            exit 1
+        # Case 4: only commit and dir file different. This case is not possible
+        elif [ "$COMMIT_FILE" = "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" = "$DIR_FILE" ] 
+        then 
+            echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
+            exit 1
+        # Case 5: dir file is different to others
+        elif [ "$COMMIT_FILE" = "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ] 
         then 
             echo_err "tigger-rm: error: '"$1"' in the repository is different to the working file"
             exit 1
-        # Case 3: file in index and dir different
-        elif [ "$INDEX_FILE" != "$DIR_FILE" ]
+        # Case 6: only file in index and dir different. Not possible
+        elif [ "$COMMIT_FILE" = "$INDEX_FILE" ] && [ "$COMMIT_FILE" = "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ] 
         then 
             echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
             exit 1
-        # Case 4: file in index and commit different
-        elif [ "$INDEX_FILE" != "$COMMIT_FILE" ]
+        # Case 7: index file is different to others
+        elif [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" = "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ] 
         then 
             echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
             exit 1
-        # Case 5: file all the same => do not raise error
+        # Case 8: all files are the same => check passed
+        else
+            :
         fi
     fi
 }
