@@ -63,15 +63,22 @@ check_if_staged () {
         return 
     fi
 
+    INDEX_FILE="$(cat .tigger/index/"$1")"
+    DIR_FILE="$(cat "$1")"
+
     # If there are no commits, immediately throw error
     if [ "$commit" -eq -1 ] || [ ! -f .tigger/commits/"$commit"/"$1" ]
     then 
-        echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
-        exit 1
+        if [ "$INDEX_FILE" != "$DIR_FILE" ]
+        then
+            echo_err "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
+            exit 1
+        else 
+            echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
+            exit 1
+        fi
     else
         COMMIT_FILE="$(cat .tigger/commits/"$commit"/"$1")"
-        INDEX_FILE="$(cat .tigger/index/"$1")"
-        DIR_FILE="$(cat "$1")"
         # Case 1: all files different
         if [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ]
         then
@@ -117,16 +124,50 @@ check_if_staged () {
 # Throw error if there is any staging differences in cache
 # Usage: check_if_staged_cached <filename>
 check_if_staged_cached () {
-    # added, committed, changed, added, changed - tigger-rm: error: 'file' in index is different to both the working file and the repository
-    if [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$1" ] && [ -f "$1" ] && [ -f .tigger/index/"$1" ] && [ ! -z "$(diff "$1" .tigger/index/"$1")" ] && [ ! -z "$(diff .tigger/index/"$1" .tigger/$(cat .tigger/last_commit)/"$1")" ]
+
+    commit=$(get_last_commit)
+
+    # If file does not exist, pass check
+    if [ ! -f "$1" ]
     then
-        echo "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
-        exit 1
-    # added - tigger-rm: error: 'file' has staged changes in the index
-    elif [ ! -f "$1" ]
+        return 
+    fi
+
+    INDEX_FILE="$(cat .tigger/index/"$1")"
+    DIR_FILE="$(cat "$1")"
+
+    # If there are no commits, pass check
+    if [ "$commit" -eq -1 ] || [ ! -f .tigger/commits/"$commit"/"$1" ]
     then 
-        echo "tigger-rm: error: '"$1"' has staged changes in the index"
-        exit 1
+        if [ "$INDEX_FILE" != "$DIR_FILE" ]
+        then
+            echo_err "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
+            exit 1
+        fi
+    else
+        COMMIT_FILE="$(cat .tigger/commits/"$commit"/"$1")"
+        # Case 1: all files different
+        if [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ]
+        then
+            echo_err "tigger-rm: error: '"$1"' in index is different to both the working file and the repository"
+            exit 1
+        # Case 2: file in commit different to others
+        elif [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" = "$DIR_FILE" ] 
+        then 
+            :
+        # Case 3: dir file is different to others
+        elif [ "$COMMIT_FILE" = "$INDEX_FILE" ] && [ "$COMMIT_FILE" != "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ] 
+        then 
+            :
+        # Case 4: index file is different to others
+        elif [ "$COMMIT_FILE" != "$INDEX_FILE" ] && [ "$COMMIT_FILE" = "$DIR_FILE" ] && [ "$INDEX_FILE" != "$DIR_FILE" ] 
+        then 
+            echo_err "tigger-rm: error: '"$1"' has staged changes in the index"
+            exit 1
+        # Case 5: all files are the same => check passed
+        else
+            :
+        fi
     fi
 }
 
@@ -134,59 +175,54 @@ check_if_staged_cached () {
 # Main
 ######################################################################
 
-##########################
-# Error Check & Preamble #
-##########################
-
 # .tigger check
 check_tigger
 
 # If first argument is empty, throw usage error
 throw_usage_error_if_empty "$1"
 
-# Shift arguments and usage error check
+# Case 1: tigger-rm --force --cached filenames...
 if [ "$1" = "--force" ] && [ "$2" = "--cached" ]
 then    
     throw_usage_error_if_empty "$3"
     shift 2
+    for file in "$@"
+    do  
+        check_file_in_index "$file"
+        rm .tigger/index/"$file"
+    done
+# Case 2: tigger-rm --force filenames...
 elif [ "$1" = "--force" ]
 then
     throw_usage_error_if_empty "$2"
     shift 1
-elif [ "$1" = "--cached" ]
-then
-    throw_usage_error_if_empty "$2"
-    shift 1
-fi
-
-################
-# Remove Files #
-################
-
-for file in "$@"
-do 
-    # Case 1: tigger-rm --force --cached filenames...
-    if [ "$1" = "--force" ] && [ "$2" = "--cached" ]
-    then    
-        check_file_in_index "$file"
-        rm .tigger/index/"$file"
-    # Case 2: tigger-rm --force filenames...
-    elif [ "$1" = "--force" ]
-    then
+    for file in "$@"
+    do  
         check_file_in_index "$file"
         rm .tigger/index/"$file"
         if [ -f "$file" ]
         then
             rm "$file"
         fi
-    # Case 3: tigger-rm --cached filenames...
-    elif [ "$1" = "--cached" ]
-    then
+    done
+# Case 3: tigger-rm --cached filenames...
+elif [ "$1" = "--cached" ]
+then
+    throw_usage_error_if_empty "$2"
+    shift 1
+    for file in "$@"
+    do  
         check_file_in_index "$file"
         check_if_staged_cached "$file"
-        rm .tigger/index/"$file"
-    # Case 4: tigger-rm filenames...
-    else 
+        if [ -f .tigger/index/"$file" ]
+        then
+            rm .tigger/index/"$file"
+        fi
+    done
+# Case 4: tigger-rm filenames...
+else 
+    for file in "$@"
+    do  
         check_file_in_index "$file" 
         check_if_staged "$file"
         rm .tigger/index/"$file"
@@ -194,5 +230,5 @@ do
         then
             rm "$file"
         fi
-    fi
-done
+    done
+fi
