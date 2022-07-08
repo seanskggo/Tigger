@@ -91,6 +91,26 @@ test_commands () {
     echo "changed again" >> b
     tigger-rm --cached b
 
+    # tigger-rm --force --cached
+    rm -rf .tigger && rm -f *
+    tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    tigger-rm --force --cached a
+    tigger-add a
+    echo "change" >> a
+    tigger-rm --force --cached a
+
+    # tigger-rm --force 
+    rm -rf .tigger && rm -f *
+    tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    tigger-rm --force a
+    tigger-add a
+    echo "change" >> a
+    tigger-rm --force a
+
     cd .. && rm -rf temp
 
 }
@@ -176,6 +196,26 @@ make_answers () {
     2041 tigger-add b 
     echo "changed again" >> b
     2041 tigger-rm --cached b
+
+    # tigger-rm --force --cached
+    rm -rf .tigger && rm -f *
+    2041 tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    2041 tigger-rm --force --cached a
+    2041 tigger-add a
+    echo "change" >> a
+    2041 tigger-rm --force --cached a
+
+    # tigger-rm --force 
+    rm -rf .tigger && rm -f *
+    2041 tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    2041 tigger-rm --force a
+    2041 tigger-add a
+    echo "change" >> a
+    2041 tigger-rm --force a
 
     cd .. && rm -rf temp
 
