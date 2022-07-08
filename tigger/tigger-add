@@ -25,7 +25,7 @@ add_to_index () {
     # If file exists, add to index
     if [ -f "$1" ]
     then
-        cp $1 .tigger/index
+        cp "$1" .tigger/index
     # If file does not exist but exists in index, remove it without error
     elif [ ! -f "$1" ] && [ -f .tigger/index/"$1" ]
     then    
@@ -44,7 +44,7 @@ add_to_index () {
 check_tigger
 
 # Case 1: tigger-add <files...>
-if [ ! -z "$1" ]
+if [ -n -z "$1" ]
 then    
     for file
     do
