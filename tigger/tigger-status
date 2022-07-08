@@ -110,19 +110,35 @@ print_status () {
         # Case 1: dir, index and commit all exists
         if [ "$DIR" != 0 ] && [ "$INDEX" != 0 ] && [ "$COMMIT" != 0 ]
         then
-            :
+            if [ "$DIR" = "$INDEX" ] && [ "$INDEX" = "$COMMIT" ]
+            then 
+                echo "$file - same as repo"
+            elif [ "$DIR" != "$INDEX" ] && [ "$INDEX" = "$COMMIT" ]
+            then 
+                echo "$file - file changed, changes not staged for commit"
+            elif [ "$DIR" = "$INDEX" ] && [ "$INDEX" != "$COMMIT" ]
+            then 
+                echo "$file - file changed, changes staged for commit"
+            else
+                echo "$file - file changed, different changes staged for commit"
+            fi
         # Case 2: dir and index exists
         elif [ "$DIR" != 0 ] && [ "$INDEX" != 0 ] && [ "$COMMIT" = 0 ]
         then
-            :
+            if [ "$DIR" = "$INDEX" ]
+            then 
+                echo "$file - added to index"
+            else    
+                echo "$file - added to index, file changed"
+            fi
         # Case 3: dir and commit exists
         elif [ "$DIR" != 0 ] && [ "$INDEX" = 0 ] && [ "$COMMIT" != 0 ]
         then
             if [ "$DIR" = "$COMMIT" ]
             then 
-                :
+                echo "$file - untracked"
             else
-                :
+                echo "$file - untracked"
             fi
         # Case 4: index and commit exists
         elif [ "$DIR" = 0 ] && [ "$INDEX" != 0 ] && [ "$COMMIT" != 0 ]
@@ -149,50 +165,6 @@ print_status () {
         else
             :
         fi
-
-
-
-
-        # # added, committed, changed, added, changed -  file changed, different changes staged for commit
-        # if [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ ! -z "$(diff "$file" .tigger/index/"$file")" ] && [ ! -z "$(diff .tigger/index/"$file" .tigger/$(cat .tigger/last_commit)/"$file")" ]
-        # then
-        #     echo "$file - file changed, different changes staged for commit"
-        # # added, committed, changed, added - file changed, changes staged for commit
-        # elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ -z "$(diff "$file" .tigger/index/"$file")" ] && [ ! -z "$(diff .tigger/index/"$file" .tigger/$(cat .tigger/last_commit)/"$file")" ]
-        # then
-        #     echo "$file - file changed, changes staged for commit"
-        # # added, commited, changed - file changed, changes not staged for commit
-        # elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ ! -z "$(diff "$file" .tigger/index/"$file")" ] && [ -z "$(diff .tigger/index/"$file" .tigger/$(cat .tigger/last_commit)/"$file")" ]
-        # then
-        #     echo "$file - file changed, changes not staged for commit"
-        # # added, committed, rm - file deleted
-        # elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ ! -f "$file" ] && [ -f .tigger/index/"$file" ]
-        # then 
-        #     echo "$file - file deleted"
-        # # added, committed, tigger-rm - deleted
-        # elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ ! -f "$file" ] && [ ! -f .tigger/index/"$file" ]
-        # then 
-        #     echo "$file - deleted"
-        # # added, committed - same as repo
-        # elif [ -f .tigger/last_commit ] && [ -f .tigger/$(cat .tigger/last_commit)/"$file" ] && [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ -z "$(diff "$file" .tigger/index/"$file")" ] && [ -z "$(diff "$file" .tigger/$(cat .tigger/last_commit)/"$file")" ]
-        # then 
-        #     echo "$file - same as repo"
-        # # added, changed - added to index, file changed
-        # elif [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ ! -z "$(diff "$file" .tigger/index/"$file")" ]
-        # then
-        #     echo "$file - added to index, file changed"
-        # # added, rm - added to index, file deleted
-        # elif [ ! -f "$file" ] && [ -f .tigger/index/"$file" ]
-        # then
-        #     echo "$file - added to index, file deleted"
-        # # added - added to index
-        # elif [ -f "$file" ] && [ -f .tigger/index/"$file" ] && [ -z "$(diff "$file" .tigger/index/"$file")" ]
-        # then
-        #     echo "$file - added to index"
-        # # nothing - untracked
-        # else 
-        #     echo "$file - untracked"
-        # fi
     done
 }
 

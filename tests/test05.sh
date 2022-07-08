@@ -23,6 +23,36 @@ test_commands () {
     tigger-init > /dev/null
     tigger-status # should succeed
 
+    # Case 1: dir, index and commit all exists
+    rm -rf .tigger && rm -f * && tigger-init > /dev/null
+    touch a
+    tigger-add a
+    tigger-commit -m test > /dev/null
+    tigger-status # dir == index == commit
+    echo "changed" > a
+    tigger-status # dir != index == commit
+    tigger-add a
+    tigger-status # dir == index != commit
+    echo "changed again" > a
+    tigger-status # dir != index != commit
+    # Case 2: dir and index exists
+    rm -rf .tigger && rm -f * && tigger-init > /dev/null
+    touch a
+    tigger-add a
+    tigger-status # dir == index
+    echo "changed" > a
+    tigger-status # dir != index
+    # Case 3: dir and commit exists
+    rm -rf .tigger && rm -f * && tigger-init > /dev/null
+    touch a
+    tigger-add a
+    tigger-commit -m test > /dev/null
+    rm a
+    tigger-add a
+    touch a
+    tigger-status # dir == commit
+    echo "changed" > a
+    tigger-status # dir != commit
     # Case 4: index and commit exists
     rm -rf .tigger && rm -f * && tigger-init > /dev/null
     touch a
@@ -72,18 +102,35 @@ make_answers () {
     2041 tigger-status # should error => usage error
 
     # Case 1: dir, index and commit all exists
-
+    rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
+    touch a
+    2041 tigger-add a
+    2041 tigger-commit -m test > /dev/null
+    2041 tigger-status # dir == index == commit
+    echo "changed" > a
+    2041 tigger-status # dir != index == commit
+    2041 tigger-add a
+    2041 tigger-status # dir == index != commit
+    echo "changed again" > a
+    2041 tigger-status # dir != index != commit
     # Case 2: dir and index exists
-
+    rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
+    touch a
+    2041 tigger-add a
+    2041 tigger-status # dir == index
+    echo "changed" > a
+    2041 tigger-status # dir != index
     # Case 3: dir and commit exists
     rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
     touch a
     2041 tigger-add a
-    2041 tigger-commit -m test
+    2041 tigger-commit -m test > /dev/null
     rm a
-    tigger-add a
+    2041 tigger-add a
     touch a
     2041 tigger-status # dir == commit
+    echo "changed" > a
+    2041 tigger-status # dir != commit
     # Case 4: index and commit exists
     rm -rf .tigger && rm -f * && 2041 tigger-init > /dev/null
     touch a
