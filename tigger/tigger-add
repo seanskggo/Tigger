@@ -44,7 +44,7 @@ add_to_index () {
 check_tigger
 
 # Case 1: tigger-add <files...>
-if [ -n -z "$1" ]
+if [ "$1" != "" ]
 then    
     for file
     do

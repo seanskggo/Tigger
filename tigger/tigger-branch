@@ -72,11 +72,11 @@ create_branch () {
 check_tigger
 
 # Case 1: tigger-branch <branch>
-if [ -n -z "$1" ] && [ -z "$2" ]
+if [ "$1" != "" ] && [ -z "$2" ]
 then        
     create_branch "$1"
 # Case 2: tigger-branch -d <branch>
-elif [ "$1" = "-d" ] && [ -n -z "$2" ] && [ -z "$3" ]
+elif [ "$1" = "-d" ] && [ "$2" != "" ] && [ -z "$3" ]
 then
     delete_branch "$2"
 # Case 3: tigger-branch
