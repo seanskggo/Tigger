@@ -35,7 +35,7 @@ check_commit_exists () {
 check_file_exists_in_index () {
     if [ ! -f .tigger/index/"$1" ]
     then
-        echo_err "tigger-show: error: '"$1"' not found in index"
+        echo_err "tigger-show: error: '$1' not found in index"
         exit 1
     fi
 }
@@ -68,7 +68,7 @@ check_if_object_is_valid () {
 check_filename_is_valid () {
     if [ -z "$1" ]
     then 
-        echo_err "tigger-show: error: invalid filename '"$1"'"
+        echo_err "tigger-show: error: invalid filename '$1'"
         exit 1
     fi
 }
