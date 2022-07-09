@@ -6,7 +6,6 @@
 # 
 # Testing commands:
 # - tigger-init 
-# - tigger-add 
 # 
 # NOTE: Assumes tigger commands are added to PATH
 ######################################################################
