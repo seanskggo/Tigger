@@ -16,7 +16,7 @@
 
 test_commands () {
 
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     tigger-show # should error => .tigger does not exist
     tigger-show test # should error => .tigger does not exist > usage error
@@ -58,7 +58,7 @@ test_commands () {
 # Created from 2041 reference implementation
 make_answers () {
 
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     2041 tigger-show # should error => .tigger does not exist
     2041 tigger-show test # should error => .tigger does not exist > usage error

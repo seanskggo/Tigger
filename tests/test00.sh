@@ -17,7 +17,7 @@
 
 test_commands () {
 
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     # tigger-init tests
     tigger-init # should succeed
@@ -51,7 +51,7 @@ test_commands () {
 # Created from 2041 reference implementation
 make_answers () {
 
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     # tigger-init tests
     2041 tigger-init 

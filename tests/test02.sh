@@ -16,7 +16,7 @@
 
 test_commands () {
 
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     tigger-log # should error => .tigger does not exist
     tigger-log test # should error => .tigger does not exist > usage error
@@ -34,7 +34,7 @@ test_commands () {
     tigger-commit -m test2 > /dev/null
     tigger-log # should succeed => 2 lines of output
 
-    rm -rf .tigger && rm *
+    rm -rf .tigger && rm ./*
     tigger-init > /dev/null
 
     count=0
@@ -59,7 +59,7 @@ test_commands () {
 # Created from 2041 reference implementation
 make_answers () {
 
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     2041 tigger-log 
     2041 tigger-log test 
@@ -77,7 +77,7 @@ make_answers () {
     2041 tigger-commit -m test2 > /dev/null
     2041 tigger-log 
 
-    rm -rf .tigger && rm *
+    rm -rf .tigger && rm ./*
     2041 tigger-init > /dev/null
 
     count=0

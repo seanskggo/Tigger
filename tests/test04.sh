@@ -16,7 +16,7 @@
 
 test_commands () {
 
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     tigger-rm # should error => .tigger does not exist > usage error
     tigger-rm test # should error => .tigger does not exist > unknown file
@@ -35,7 +35,7 @@ test_commands () {
     tigger-rm a # should fail after removal
 
     # tigger-rm 
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
@@ -60,7 +60,7 @@ test_commands () {
     tigger-rm b
 
     # tigger-rm --cached
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
@@ -92,7 +92,7 @@ test_commands () {
     tigger-rm --cached b
 
     # tigger-rm --force --cached
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
@@ -102,7 +102,7 @@ test_commands () {
     tigger-rm --force --cached a
 
     # tigger-rm --force 
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
@@ -122,7 +122,7 @@ test_commands () {
 # 2041 reference implementation output
 make_answers () {
     
-    mkdir temp && cd temp
+    mkdir temp && cd temp || exit
 
     2041 tigger-rm 
     2041 tigger-rm test 
@@ -141,7 +141,7 @@ make_answers () {
     2041 tigger-rm a 
 
     # tigger-rm 
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     2041 tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
@@ -166,7 +166,7 @@ make_answers () {
     2041 tigger-rm b
 
     # tigger-rm --cached
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     2041 tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
@@ -198,7 +198,7 @@ make_answers () {
     2041 tigger-rm --cached b
 
     # tigger-rm --force --cached
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     2041 tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
@@ -208,7 +208,7 @@ make_answers () {
     2041 tigger-rm --force --cached a
 
     # tigger-rm --force 
-    rm -rf .tigger && rm -f *
+    rm -rf .tigger && rm -f ./*
     2041 tigger-init > /dev/null
     # Case 1: file and index differ (test both ways)
     echo "test" > a
