@@ -22,7 +22,7 @@ check_tigger () {
 # Get last commit number if there is one otherwise return -1
 # Usage: get_last_commit
 get_last_commit () {
-    last_commit=$(ls .tigger/commits | tr ' ' '\n' | tail -n 1)
+    last_commit=$(find .tigger/commits -maxdepth 1 -mindepth 1 | sed -E 's/.tigger\/commits\/(.*)/\1/g' | tr ' ' '\n' | sort | tail -n 1)
     if [ -z "$last_commit" ]
     then 
         echo "-1"
