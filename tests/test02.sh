@@ -2,10 +2,10 @@
 
 ######################################################################
 # Test Script No. 2
-# Subset 0 
+# Subset 0 & 1
 # 
 # Testing commands:
-# - tigger-log
+# - tigger-commit
 # 
 # NOTE: Assumes tigger commands are added to PATH
 ######################################################################
@@ -18,35 +18,38 @@ test_commands () {
 
     mkdir temp && cd temp || exit
 
-    tigger-log # should error => .tigger does not exist
-    tigger-log test # should error => .tigger does not exist > usage error
+    # tigger-init tests
+    tigger-commit # should error => .tigger does not exist
+    tigger-commit asdf # should error => .tigger does not exist > usage error
     tigger-init > /dev/null
-    tigger-log test # should error => usage error
-    tigger-log # should succeed => empty output
+    tigger-commit # should error => usage error
+    tigger-commit asdf # should error => usage error
+    tigger-commit -m # should error => usage error
+    tigger-commit -a -m # should error => usage error
+    tigger-commit -m test # should error => nothing to commit
 
     touch a 
-    tigger-add a
-    tigger-commit -m test > /dev/null
-    tigger-log # should succeed => 1 line of output
+    tigger-commit -a -m test # should error => nothing to commit
+    tigger-add a 
+    tigger-commit -m test # should succeed
+    tigger-commit -a -m test # should error => nothing to commit
+    echo 'changed' > a
+    tigger-commit -m test # should error => nothing to commit
+    tigger-commit -a -m test # should succeed
 
     touch b
-    tigger-add b
-    tigger-commit -m test2 > /dev/null
-    tigger-log # should succeed => 2 lines of output
+    tigger-add b 
+    tigger-commit -a -m test # should succeed
+    tigger-commit -m test # should error => nothing to commit
 
     rm -rf .tigger && rm ./*
     tigger-init > /dev/null
-
-    count=0
-    while [ "$count" -le 10 ]
-    do 
-        touch "$count"
-        tigger-add "$count"
-        tigger-commit -m "count test $count" > /dev/null
-        count=$((count + 1))
-    done
-
-    tigger-log # should succeed => 11 outputs in numerical order
+    touch b
+    tigger-add b 
+    tigger-commit -m test # should succeed
+    echo "changed" >> b
+    tigger-commit -m test # should error => nothing to commit
+    tigger-commit -a -m test # should succeed
 
     cd .. && rm -rf temp
 
@@ -61,38 +64,39 @@ make_answers () {
 
     mkdir temp && cd temp || exit
 
-    2041 tigger-log 
-    2041 tigger-log test 
+    2041 tigger-commit 
+    2041 tigger-commit asdf 
     2041 tigger-init > /dev/null
-    2041 tigger-log test 
-    2041 tigger-log 
+    2041 tigger-commit 
+    2041 tigger-commit asdf 
+    2041 tigger-commit -m 
+    2041 tigger-commit -a -m 
+    2041 tigger-commit -m test 
 
     touch a 
-    2041 tigger-add a
-    2041 tigger-commit -m test > /dev/null
-    2041 tigger-log 
+    2041 tigger-commit -a -m test 
+    2041 tigger-add a 
+    2041 tigger-commit -m test 
+    2041 tigger-commit -a -m test 
+    echo 'changed' > a
+    2041 tigger-commit -m test 
+    2041 tigger-commit -a -m test 
 
     touch b
-    2041 tigger-add b
-    2041 tigger-commit -m test2 > /dev/null
-    2041 tigger-log 
+    2041 tigger-add b 
+    2041 tigger-commit -a -m test 
+    2041 tigger-commit -m test 
 
     rm -rf .tigger && rm ./*
     2041 tigger-init > /dev/null
-
-    count=0
-    while [ "$count" -le 10 ]
-    do 
-        touch "$count"
-        2041 tigger-add "$count"
-        2041 tigger-commit -m "count test $count" > /dev/null
-        count=$((count + 1))
-    done
-
-    2041 tigger-log 
+    touch b
+    2041 tigger-add b 
+    2041 tigger-commit -m test 
+    echo "changed" >> b
+    2041 tigger-commit -m test 
+    2041 tigger-commit -a -m test
 
     cd .. && rm -rf temp
-
 }
 
 ######################################################################

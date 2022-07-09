@@ -5,7 +5,7 @@
 # Subset 0 
 # 
 # Testing commands:
-# - tigger-show
+# - tigger-log
 # 
 # NOTE: Assumes tigger commands are added to PATH
 ######################################################################
@@ -18,34 +18,35 @@ test_commands () {
 
     mkdir temp && cd temp || exit
 
-    tigger-show # should error => .tigger does not exist
-    tigger-show test # should error => .tigger does not exist > usage error
+    tigger-log # should error => .tigger does not exist
+    tigger-log test # should error => .tigger does not exist > usage error
     tigger-init > /dev/null
-    tigger-show # should error => usage error
-    tigger-show test # should error => invalid object
-    tigger-show : # should error => invalid filename
-    tigger-show test:test # should error => unknown commit
-    tigger-show 0:test # should error => unknown commit
-    tigger-show 0: # should error => unknown commit > invalid filename 
+    tigger-log test # should error => usage error
+    tigger-log # should succeed => empty output
 
-    echo "test 1" > a
-    echo "test 2" > b
-    echo "test 3" > c
-    tigger-add a b 
-    tigger-commit -m test > /dev/null
-    tigger-show 0:a # should succeed 
-    tigger-show :a # should succeed 
-    echo "add" >> a
-    tigger-show :a # should succeed => no change
+    touch a 
     tigger-add a
-    tigger-show :a # should succeed => changed
     tigger-commit -m test > /dev/null
-    tigger-show :a # should succeed => no change from previous
-    tigger-show :b # should succeed 
-    tigger-show 100:a # should error => unknown commit
-    tigger-show 100:y # should error => unknown commit > unknown file in commit
-    tigger-show 0:y # should error => unknown commit > unknown file 
-    tigger-show :y # should error => unknown commit > unknown file in index
+    tigger-log # should succeed => 1 line of output
+
+    touch b
+    tigger-add b
+    tigger-commit -m test2 > /dev/null
+    tigger-log # should succeed => 2 lines of output
+
+    rm -rf .tigger && rm ./*
+    tigger-init > /dev/null
+
+    count=0
+    while [ "$count" -le 10 ]
+    do 
+        touch "$count"
+        tigger-add "$count"
+        tigger-commit -m "count test $count" > /dev/null
+        count=$((count + 1))
+    done
+
+    tigger-log # should succeed => 11 outputs in numerical order
 
     cd .. && rm -rf temp
 
@@ -60,34 +61,35 @@ make_answers () {
 
     mkdir temp && cd temp || exit
 
-    2041 tigger-show # should error => .tigger does not exist
-    2041 tigger-show test # should error => .tigger does not exist > usage error
+    2041 tigger-log 
+    2041 tigger-log test 
     2041 tigger-init > /dev/null
-    2041 tigger-show # should error => usage error
-    2041 tigger-show test # should error => invalid object
-    2041 tigger-show : # should error => invalid filename
-    2041 tigger-show test:test # should error => unknown commit
-    2041 tigger-show 0:test # should error => unknown commit
-    2041 tigger-show 0: # should error => unknown commit > invalid filename 
+    2041 tigger-log test 
+    2041 tigger-log 
 
-    echo "test 1" > a
-    echo "test 2" > b
-    echo "test 3" > c
-    2041 tigger-add a b 
-    2041 tigger-commit -m test > /dev/null
-    2041 tigger-show 0:a 
-    2041 tigger-show :a 
-    echo "add" >> a
-    2041 tigger-show :a 
+    touch a 
     2041 tigger-add a
-    2041 tigger-show :a 
     2041 tigger-commit -m test > /dev/null
-    2041 tigger-show :a 
-    2041 tigger-show :b 
-    2041 tigger-show 100:a 
-    2041 tigger-show 100:y 
-    2041 tigger-show 0:y 
-    2041 tigger-show :y 
+    2041 tigger-log 
+
+    touch b
+    2041 tigger-add b
+    2041 tigger-commit -m test2 > /dev/null
+    2041 tigger-log 
+
+    rm -rf .tigger && rm ./*
+    2041 tigger-init > /dev/null
+
+    count=0
+    while [ "$count" -le 10 ]
+    do 
+        touch "$count"
+        2041 tigger-add "$count"
+        2041 tigger-commit -m "count test $count" > /dev/null
+        count=$((count + 1))
+    done
+
+    2041 tigger-log 
 
     cd .. && rm -rf temp
 

@@ -5,7 +5,7 @@
 # Subset 1
 # 
 # Testing commands:
-# - tigger-status
+# - tigger-rm
 # 
 # NOTE: Assumes tigger commands are added to PATH
 ######################################################################
@@ -18,70 +18,98 @@ test_commands () {
 
     mkdir temp && cd temp || exit
 
-    tigger-status # should error => .tigger does not exist
-    tigger-status test # should error => .tigger does not exist > usage error
+    tigger-rm # should error => .tigger does not exist > usage error
+    tigger-rm test # should error => .tigger does not exist > unknown file
     tigger-init > /dev/null
-    tigger-status # should succeed
+    tigger-rm # should error => usage error              
+    tigger-rm --force # should error => usage error         
+    tigger-rm --force --cached # should error => usage error 
 
-    # Case 1: dir, index and commit all exists
-    rm -rf .tigger && rm -f ./* && tigger-init > /dev/null
-    touch a
+    tigger-rm a # should error => file not in repository
+    touch a                                         
+    tigger-rm a # should error => file not in repository
+    tigger-add a                                     
+    tigger-rm a # should error => file not in repository                               
+    tigger-commit -m test > /dev/null               
+    tigger-rm a # should succeed
+    tigger-rm a # should fail after removal
+
+    # tigger-rm 
+    rm -rf .tigger && rm -f ./*
+    tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    tigger-rm a
     tigger-add a
+    tigger-rm a
+    # Case 2: file and commit differ (+ test with deleted file)
     tigger-commit -m test > /dev/null
-    tigger-status # dir == index == commit
     echo "changed" > a
-    tigger-status # dir != index == commit
-    tigger-add a
-    tigger-status # dir == index != commit
-    echo "changed again" > a
-    tigger-status # dir != index != commit
-    # Case 2: dir and index exists
-    rm -rf .tigger && rm -f ./* && tigger-init > /dev/null
-    touch a
-    tigger-add a
-    tigger-status # dir == index
-    echo "changed" > a
-    tigger-status # dir != index
-    # Case 3: dir and commit exists
-    rm -rf .tigger && rm -f ./* && tigger-init > /dev/null
-    touch a
-    tigger-add a
+    tigger-rm a
+    rm a
+    tigger-rm a
+    # Case 3: commit and index differ
+    echo "new" > b
+    tigger-add b
     tigger-commit -m test > /dev/null
-    rm a
+    echo "changed" > b
+    tigger-add b
+    tigger-rm b
+    # Case 4: commit, index file all differ
+    echo "changed again" > b
+    tigger-rm b
+
+    # tigger-rm --cached
+    rm -rf .tigger && rm -f ./*
+    tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    tigger-rm --cached a
     tigger-add a
-    touch a
-    tigger-status # dir == commit
-    echo "changed" > a
-    tigger-status # dir != commit
-    # Case 4: index and commit exists
-    rm -rf .tigger && rm -f ./* && tigger-init > /dev/null
-    touch a
-    tigger-add a
+    echo "change" >> a
+    tigger-rm --cached a
+    # Case 2: file and commit differ (+ test with deleted file)
     tigger-commit -m test > /dev/null
-    rm a
-    tigger-status # index == commit
-    echo "changed" > a
-    tigger-add a
-    rm a
-    tigger-status # index != commit
-    # Case 5: dir exists
-    rm -rf .tigger && rm -f ./* && tigger-init > /dev/null
-    touch a
-    tigger-status
-    # Case 6: index exists
-    rm -rf .tigger && rm -f ./* && tigger-init > /dev/null
-    touch a
-    tigger-add a 
-    rm a
-    tigger-status
-    # Case 7: commit exists
-    rm -rf .tigger && rm -f ./* && tigger-init > /dev/null
-    touch a
-    tigger-add a 
+    echo "changed 2" > a
+    tigger-rm --cached a
+    touch b
+    tigger-add b
+    tigger-rm --cached b
+    # Case 3: commit and index differ
+    echo "new" > b
+    tigger-add b
     tigger-commit -m test > /dev/null
-    rm a
-    tigger-add a 
-    tigger-status
+    echo "changed" > b
+    tigger-add b
+    tigger-rm --cached b
+    # Case 4: commit, index file all differ
+    echo "new again" > b
+    tigger-add b
+    tigger-commit -m test > /dev/null
+    echo "changed" >> b
+    tigger-add b 
+    echo "changed again" >> b
+    tigger-rm --cached b
+
+    # tigger-rm --force --cached
+    rm -rf .tigger && rm -f ./*
+    tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    tigger-rm --force --cached a
+    tigger-add a
+    echo "change" >> a
+    tigger-rm --force --cached a
+
+    # tigger-rm --force 
+    rm -rf .tigger && rm -f ./*
+    tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    tigger-rm --force a
+    tigger-add a
+    echo "change" >> a
+    tigger-rm --force a
 
     cd .. && rm -rf temp
 
@@ -91,75 +119,103 @@ test_commands () {
 # Create file with expected answers
 ######################################################################
 
-# Created from 2041 reference implementation
+# 2041 reference implementation output
 make_answers () {
-
+    
     mkdir temp && cd temp || exit
 
-    2041 tigger-status # should error => .tigger does not exist
-    2041 tigger-status test # should error => .tigger does not exist > usage error
-    2041 tigger-init > /dev/null
-    2041 tigger-status # should error => usage error
+    2041 tigger-rm 
+    2041 tigger-rm test 
+    2041 tigger-init > /dev/null                         
+    2041 tigger-rm                                       
+    2041 tigger-rm --force                               
+    2041 tigger-rm --force --cached                      
+    2041 tigger-rm a                                     
 
-    # Case 1: dir, index and commit all exists
-    rm -rf .tigger && rm -f ./* && 2041 tigger-init > /dev/null
-    touch a
+    touch a                                         
+    2041 tigger-rm a                                     
+    2041 tigger-add a                                    
+    2041 tigger-rm a                                     
+    2041 tigger-commit -m test > /dev/null               
+    2041 tigger-rm a 
+    2041 tigger-rm a 
+
+    # tigger-rm 
+    rm -rf .tigger && rm -f ./*
+    2041 tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    2041 tigger-rm a
     2041 tigger-add a
+    2041 tigger-rm a
+    # Case 2: file and commit differ (+ test with deleted file)
     2041 tigger-commit -m test > /dev/null
-    2041 tigger-status # dir == index == commit
     echo "changed" > a
-    2041 tigger-status # dir != index == commit
-    2041 tigger-add a
-    2041 tigger-status # dir == index != commit
-    echo "changed again" > a
-    2041 tigger-status # dir != index != commit
-    # Case 2: dir and index exists
-    rm -rf .tigger && rm -f ./* && 2041 tigger-init > /dev/null
-    touch a
-    2041 tigger-add a
-    2041 tigger-status # dir == index
-    echo "changed" > a
-    2041 tigger-status # dir != index
-    # Case 3: dir and commit exists
-    rm -rf .tigger && rm -f ./* && 2041 tigger-init > /dev/null
-    touch a
-    2041 tigger-add a
+    2041 tigger-rm a
+    rm a
+    2041 tigger-rm a
+    # Case 3: commit and index differ
+    echo "new" > b
+    2041 tigger-add b
     2041 tigger-commit -m test > /dev/null
-    rm a
+    echo "changed" > b
+    2041 tigger-add b
+    2041 tigger-rm b
+    # Case 4: commit, index file all differ
+    echo "changed again" > b
+    2041 tigger-rm b
+
+    # tigger-rm --cached
+    rm -rf .tigger && rm -f ./*
+    2041 tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    2041 tigger-rm --cached a
     2041 tigger-add a
-    touch a
-    2041 tigger-status # dir == commit
-    echo "changed" > a
-    2041 tigger-status # dir != commit
-    # Case 4: index and commit exists
-    rm -rf .tigger && rm -f ./* && 2041 tigger-init > /dev/null
-    touch a
-    2041 tigger-add a
+    echo "change" >> a
+    2041 tigger-rm --cached a
+    # Case 2: file and commit differ (+ test with deleted file)
     2041 tigger-commit -m test > /dev/null
-    rm a
-    2041 tigger-status # index == commit
-    echo "changed" > a
-    2041 tigger-add a
-    rm a
-    2041 tigger-status # index != commit
-    # Case 5: dir exists
-    rm -rf .tigger && rm -f ./* && 2041 tigger-init > /dev/null
-    touch a
-    2041 tigger-status
-    # Case 6: index exists
-    rm -rf .tigger && rm -f ./* && 2041 tigger-init > /dev/null
-    touch a
-    2041 tigger-add a 
-    rm a
-    2041 tigger-status
-    # Case 7: commit exists
-    rm -rf .tigger && rm -f ./* && 2041 tigger-init > /dev/null
-    touch a
-    2041 tigger-add a 
+    echo "changed 2" > a
+    2041 tigger-rm --cached a
+    touch b
+    2041 tigger-add b
+    2041 tigger-rm --cached b
+    # Case 3: commit and index differ
+    echo "new" > b
+    2041 tigger-add b
     2041 tigger-commit -m test > /dev/null
-    rm a
-    2041 tigger-add a 
-    2041 tigger-status
+    echo "changed" > b
+    2041 tigger-add b
+    2041 tigger-rm --cached b
+    # Case 4: commit, index file all differ
+    echo "new again" > b
+    2041 tigger-add b
+    2041 tigger-commit -m test > /dev/null
+    echo "changed" >> b
+    2041 tigger-add b 
+    echo "changed again" >> b
+    2041 tigger-rm --cached b
+
+    # tigger-rm --force --cached
+    rm -rf .tigger && rm -f ./*
+    2041 tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    2041 tigger-rm --force --cached a
+    2041 tigger-add a
+    echo "change" >> a
+    2041 tigger-rm --force --cached a
+
+    # tigger-rm --force 
+    rm -rf .tigger && rm -f ./*
+    2041 tigger-init > /dev/null
+    # Case 1: file and index differ (test both ways)
+    echo "test" > a
+    2041 tigger-rm --force a
+    2041 tigger-add a
+    echo "change" >> a
+    2041 tigger-rm --force a
 
     cd .. && rm -rf temp
 
@@ -177,8 +233,11 @@ then
     echo "PASSED"
 else
     echo "FAILED"
-    # diff -y a b | cat -n | grep -v -e '($'  
-    diff a b 
+    # diff a b
+    # cat a
+    # echo "-"
+    # cat b
+    diff -y a b | cat -n | grep -v -e '($'  
 fi
 
 rm a b
