@@ -88,13 +88,13 @@ check_tigger
 new_commit=$(($(get_last_commit) + 1))
 
 # Case 1: tigger-commit -a -m <message>
-if [ "$1" = "-a" ] && [ "$2" = "-m" ] && [ ! -z "$3" ]
+if [ "$1" = "-a" ] && [ "$2" = "-m" ] && [ "$3" != "" ]
 then    
     add_to_index
     check_last_commit_diff
     commit "$new_commit" "$3"
 # Case 2: tigger-commit -m <message>
-elif [ "$1" = "-m" ] && [ ! -z "$2" ]
+elif [ "$1" = "-m" ] && [ "$2" != "" ]
 then
     check_last_commit_diff
     commit "$new_commit" "$2"

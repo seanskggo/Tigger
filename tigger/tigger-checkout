@@ -28,13 +28,13 @@ check_tigger () {
 # Check if .tigger-checkout is valid from current branch
 # usage check_branch <branch>
 check_branch () {
-    if [ $(cat .tigger/current_branch) = "$1" ]
+    if [ "$(cat .tigger/current_branch)" = "$1" ]
     then 
-        echo "Already on '"$1"'"
+        echo "Already on '$1'"
         exit 1
     elif [ ! -d .tigger/branches/"$1" ]
     then
-        echo "tigger-checkout: error: unknown branch '"$1"'" 
+        echo "tigger-checkout: error: unknown branch '$1'" 
         exit 1
     fi
 }
@@ -43,15 +43,15 @@ check_branch () {
 # Usage: change_branch <branch>
 change_branch () {
     # Save state to current branch
-    cp -r .tigger/index .tigger/branches/$(cat .tigger/current_branch)/index
-    rsync -Rr . .tigger/branches/$(cat .tigger/current_branch)/files --exclude .tigger
+    cp -r .tigger/index .tigger/branches/"$(cat .tigger/current_branch)"/index
+    rsync -Rr . .tigger/branches/"$(cat .tigger/current_branch)"/files --exclude .tigger
     # Delete state
-    rm -rf *
+    rm -rf ./*
     # Load state from specified branch
     cp -r .tigger/branches/"$1"/index .tigger/index
     cp -r .tigger/branches/"$1"/files/* .
     echo "$1" > .tigger/current_branch
-    echo "Switched to branch '"$1"'"
+    echo "Switched to branch '$1'"
 }
 
 ######################################################################
@@ -61,7 +61,7 @@ change_branch () {
 check_tigger
 
 # Case 1: tigger-branch <branch>
-if [ ! -z "$1" ] && [ -z "$2" ]
+if [ "$1" != "" ] && [ -z "$2" ]
 then        
     check_branch "$1"
     change_branch "$1"
