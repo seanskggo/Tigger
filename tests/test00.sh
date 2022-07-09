@@ -19,26 +19,11 @@ test_commands () {
 
     mkdir temp && cd temp || exit
 
-    # tigger-init tests
     tigger-init # should succeed
     tigger-init # should error => .tigger already exists
     tigger-init asdf # should error => .tigger already exists > usage error
     rm -rf .tigger 
     tigger-init asdf # should error => usage error
-
-    # tigger-add tests
-    tigger-init
-    touch a b
-    tigger-add a b # should succeed
-    tigger-add c # should error => non existent file
-    rm -rf .tigger
-    tigger-add a b # should error => no .tigger present
-    tigger-add c # should error => no .tigger error > non existent file error
-    tigger-init
-    tigger-add # should error => usage error
-    tigger-add a # should error => usage error
-    rm a 
-    tigger-add a # should succeed (adding deleted file to index)
 
     cd .. && rm -rf temp
 
@@ -53,26 +38,11 @@ make_answers () {
 
     mkdir temp && cd temp || exit
 
-    # tigger-init tests
     2041 tigger-init 
     2041 tigger-init 
     2041 tigger-init asdf 
     rm -rf .tigger 
     2041 tigger-init asdf 
-
-    # tigger-add tests
-    2041 tigger-init
-    touch a b
-    2041 tigger-add a b 
-    2041 tigger-add c 
-    rm -rf .tigger
-    2041 tigger-add a b 
-    2041 tigger-add c 
-    2041 tigger-init
-    2041 tigger-add 
-    2041 tigger-add a 
-    rm a 
-    2041 tigger-add a 
 
     cd .. && rm -rf temp
 
