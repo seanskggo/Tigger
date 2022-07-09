@@ -75,7 +75,7 @@ get_unique_files () {
             fi
         fi
     done
-    echo "$str" | sed -E 's/#\-+#/,/g' | sed -E 's/(\-#|#\-)//g' | sed -E $'s/,/\n/g' | sort | tr '\n' ',' | sed 's/.$//'
+    echo "$str" | sed -E 's/#\-+#/,/g' | sed -E 's/(\-#|#\-)//g' | sed -E 's/,/\n/g' | sort | tr '\n' ',' | sed 's/.$//'
 }
 
 # Given comma separated list of files, print status for each file in order
