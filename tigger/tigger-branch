@@ -77,7 +77,7 @@ create_branch () {
     mkdir .tigger/branches/"$1"/files
     mkdir .tigger/branches/"$1"/index
     curr_branch=$(cat .tigger/current_branch)
-    echo "$(get_last_commit_of_branch "$curr_branch")" > .tigger/branches/"$1"/log
+    get_last_commit_of_branch "$curr_branch" > .tigger/branches/"$1"/log
 }
 
 ######################################################################

@@ -60,14 +60,14 @@ change_branch () {
     last_commit_branch=$(get_last_commit_of_branch "$1")
     last_commit_curr=$(get_last_commit)
 
-    if [ -z "$(diff -r .tigger/commits/"$last_commit_curr" .tigger/index | grep -v '^Only in')" ]
+    if [ "$(diff -r .tigger/commits/"$last_commit_curr" .tigger/index | grep -v '^Only in')" = "" ]
     then 
         BRANCH=1
     else
         BRANCH=0
     fi
 
-    if [ -z "$(diff -r .tigger/commits/"$last_commit_curr" . | grep -v '^Only in')" ]
+    if [ "$(diff -r .tigger/commits/"$last_commit_curr" . | grep -v '^Only in')" = "" ]
     then 
         CURR=1
     else
