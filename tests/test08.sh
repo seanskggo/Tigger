@@ -10,7 +10,7 @@
 # NOTE: Assumes tigger commands are added to PATH
 #
 # *** INCOMPLETE ***
-# I have not finished tigger-checkout
+# I have not completed tigger-checkout fully
 ######################################################################
 
 ######################################################################

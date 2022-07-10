@@ -2,7 +2,7 @@
 
 count=0
 
-while [ "$count" -lt 10 ]
+while [ "$count" -lt 9 ]
 do 
     echo "------- Test $count -------"
     sh tests/test0"$count".sh
