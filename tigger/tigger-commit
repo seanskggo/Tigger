@@ -21,6 +21,8 @@ check_tigger () {
     then
         mkdir .tigger/branches
         mkdir .tigger/branches/master
+        mkdir .tigger/branches/master/files
+        mkdir .tigger/branches/master/index
         echo "master" > .tigger/current_branch
     fi
 }
