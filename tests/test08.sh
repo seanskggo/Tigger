@@ -40,17 +40,17 @@ test_commands () {
     tigger-commit -m test
     tigger-branch branch1
     tigger-checkout branch1
-    cat a
+    cat a && ls
     echo "not new" > a
-    cat a
+    cat a && ls
     tigger-checkout master
-    cat a
+    cat a && ls
     tigger-checkout branch1
-    cat a
+    cat a && ls
     tigger-commit -a -m test
-    cat a
+    cat a && ls
     tigger-checkout master
-    cat a
+    cat a && ls
 
     cd .. && rm -rf temp
 
@@ -89,15 +89,15 @@ make_answers () {
     2041 tigger-checkout branch1
     cat a
     echo "not new" > a
-    cat a
+    cat a && ls
     2041 tigger-checkout master
-    cat a
+    cat a && ls
     2041 tigger-checkout branch1
-    cat a
+    cat a && ls
     2041 tigger-commit -a -m test
-    cat a
+    cat a && ls
     2041 tigger-checkout master
-    cat a
+    cat a && ls
 
     cd .. && rm -rf temp
 
