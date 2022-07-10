@@ -49,26 +49,53 @@ check_branch () {
 # Retrieves the last commit of the specified branch
 # Usage: get_last_commit_of_branch <branch>
 get_last_commit_of_branch () {
-    cat .tigger/branches/"$1"/log
+    cat .tigger/branches/"$1"/log | tail -n 1
+}
+
+# Given a branch, save current branch state to that branch
+# Usage: save_to_branch <branch>
+save_to_branch () {
+    cp -r .tigger/index .tigger/branches/"$1"/index
+    cp -r . .tigger/branches/"$1"/files
 }
 
 # Change to specified branch
 # Usage: change_branch <branch>
 change_branch () {
 
+    last_commit_branch=$(get_last_commit_of_branch "$1")
+    last_commit_curr=$(get_last_commit)
 
+    if [ -n "$last_commit_branch" ]
+    then 
+        if [ -z "$(diff -r .tigger/commits/$last_commit_curr .tigger/index)" ]
+        then 
+            BRANCH=1
+        else
+            BRANCH=0
+        fi
 
+        if [ -z "$(diff -r .tigger/commits/$last_commit_curr ./*)" ]
+        then 
+            CURR=1
+        else
+            CURR=0
+        fi
+    else 
+        BRANCH=0
+        CURR=0
+    fi
 
-    # Save state to current branch
-    cp -r .tigger/index .tigger/branches/"$(cat .tigger/current_branch)"/index
-    rsync -Rr . .tigger/branches/"$(cat .tigger/current_branch)"/files --exclude .tigger
-    # Delete state
-    rm -rf ./*
-    # Load state from specified branch
-    cp -r .tigger/branches/"$1"/index .tigger/index
-    cp -r .tigger/branches/"$1"/files/* .
+    if [ "$BRANCH" = 1 ] && [ "$CURR" = 1 ]
+    then 
+        rm -rf ./*
+        cp -r .tigger/commits/"$last_commit_branch" .tigger/index
+        cp -r .tigger/commits/"$last_commit_branch"/* .
+    fi
+
     echo "$1" > .tigger/current_branch
     echo "Switched to branch '$1'"
+
 }
 
 ######################################################################
@@ -86,3 +113,4 @@ then
 else 
     echo "usage: tigger-checkout <branch>"
 fi
+

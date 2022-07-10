@@ -87,7 +87,7 @@ make_answers () {
     2041 tigger-commit -m test
     2041 tigger-branch branch1
     2041 tigger-checkout branch1
-    cat a
+    cat a && ls
     echo "not new" > a
     cat a && ls
     2041 tigger-checkout master
