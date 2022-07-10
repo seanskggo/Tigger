@@ -1,13 +1,16 @@
 #!/bin/dash
 
 ######################################################################
-# Test Script No. 8
+# Test Script No. 8 
 # Subset 2
 # 
 # Testing commands:
 # - tigger-checkout
 # 
 # NOTE: Assumes tigger commands are added to PATH
+#
+# *** INCOMPLETE ***
+# I have not finished tigger-checkout
 ######################################################################
 
 ######################################################################
