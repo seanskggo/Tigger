@@ -46,9 +46,19 @@ check_branch () {
     fi
 }
 
+# Retrieves the last commit of the specified branch
+# Usage: get_last_commit_of_branch <branch>
+get_last_commit_of_branch () {
+    cat .tigger/branches/"$1"/log
+}
+
 # Change to specified branch
 # Usage: change_branch <branch>
 change_branch () {
+
+
+
+
     # Save state to current branch
     cp -r .tigger/index .tigger/branches/"$(cat .tigger/current_branch)"/index
     rsync -Rr . .tigger/branches/"$(cat .tigger/current_branch)"/files --exclude .tigger
