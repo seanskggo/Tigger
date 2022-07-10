@@ -58,6 +58,13 @@ delete_branch() {
     echo "Deleted branch '$1'"
 }
 
+# Retrieves the last commit of the specified branch
+# Usage: get_last_commit_of_branch <branch>
+get_last_commit_of_branch () {
+    log=$(cat .tigger/branches/"$1"/log)
+    echo "$log" | tail -n 1
+}
+
 # Create branch
 # create_branch <branch>
 create_branch () {
@@ -69,7 +76,8 @@ create_branch () {
     mkdir .tigger/branches/"$1"
     mkdir .tigger/branches/"$1"/files
     mkdir .tigger/branches/"$1"/index
-    touch .tigger/branches/"$1"/log
+    curr_branch=$(cat .tigger/current_branch)
+    echo "$(get_last_commit_of_branch "$curr_branch")" > .tigger/branches/"$1"/log
 }
 
 ######################################################################

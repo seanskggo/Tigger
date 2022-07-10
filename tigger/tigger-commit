@@ -23,7 +23,7 @@ check_tigger () {
         mkdir .tigger/branches/master
         mkdir .tigger/branches/master/files
         mkdir .tigger/branches/master/index
-        touch .tigger/branches/master/log
+        echo "0" > .tigger/branches/master/log
         echo "master" > .tigger/current_branch
     fi
 }
