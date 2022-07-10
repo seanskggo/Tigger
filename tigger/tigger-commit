@@ -17,6 +17,12 @@ check_tigger () {
         echo_err "tigger-commit: error: tigger repository directory .tigger not found"
         exit 1
     fi
+    if [ ! -d .tigger/branches ]
+    then
+        mkdir .tigger/branches
+        mkdir .tigger/branches/master
+        echo "master" > .tigger/current_branch
+    fi
 }
 
 # Get last commit number if there is one otherwise return -1
@@ -59,6 +65,7 @@ commit () {
     done
     echo "$2" > .tigger/message/"$1"
     echo "$1" > .tigger/last_commit
+    echo "$1" >> .tigger/branches/"$(cat .tigger/current_branch)"/log
     echo "Committed as commit $1"
 }
 
